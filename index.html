@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frigo Equipe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>Frigo Equipe</h1>
+        <p>Boissons, friandises, surgelés et crédits</p>
+      </div>
+      <div class="kiosk-sidebar-filter" aria-label="Catégories équipiers">
+        <span>Catégories</span>
+        <div id="member-group-buttons" class="category-button-group" role="group" aria-label="Filtrer par catégorie"></div>
+      </div>
+      <div class="kiosk-sidebar-add">
+        <button id="toggle-kiosk-member-form" class="secondary-button kiosk-add-toggle" type="button" aria-expanded="false">
+          <i data-lucide="user-plus"></i>
+          Ajouter un équipier
+        </button>
+        <form id="kiosk-member-form" class="kiosk-member-form hidden" aria-label="Ajouter un équipier">
+          <input name="name" required placeholder="Nouvel équipier" autocomplete="off" />
+          <select name="group"></select>
+          <button class="secondary-button" type="submit">
+            <i data-lucide="user-plus"></i>
+            Ajouter
+          </button>
+        </form>
+      </div>
+      <div id="sync-status" class="sync-status" data-tone="neutral">Chargement</div>
+    </header>
+
+    <main>
+      <section id="kiosk" class="view active-view" aria-labelledby="kiosk-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="kiosk-title">Kiosque tactile</h2>
+            <p>Sélectionnez un équipier, ajoutez les produits, puis encaissez ou mettez en crédit.</p>
+          </div>
+        </div>
+
+        <div class="kiosk-layout">
+          <aside class="panel">
+            <h3><i data-lucide="users"></i> Équipier</h3>
+            <div class="member-tools">
+              <div class="alphabet-filter">
+                <button id="toggle-member-letter-filter" class="secondary-button alphabet-toggle" type="button" aria-expanded="false">
+                  <i data-lucide="list-filter"></i>
+                  Alphabet
+                </button>
+                <div id="member-letter-buttons" class="letter-button-group hidden" role="group" aria-label="Filtrer par initiale"></div>
+              </div>
+            </div>
+            <div id="member-picker" class="member-grid"></div>
+          </aside>
+
+        </div>
+      </section>
+
+      <section id="management" class="view" aria-labelledby="management-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="management-title">Gestion</h2>
+            <p>Stocks, remplissage, inventaires, caisse et crédits.</p>
+          </div>
+          <div class="toolbar">
+            <button id="export-data" class="secondary-button">
+              <i data-lucide="download"></i>
+              Exporter
+            </button>
+            <label class="file-button">
+              <i data-lucide="upload"></i>
+              Importer
+              <input id="import-data" type="file" accept="application/json" />
+            </label>
+            <button id="reset-demo" class="danger-button">
+              <i data-lucide="rotate-ccw"></i>
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <div class="management-shell">
+          <aside class="management-sidebar" aria-label="Navigation gestion">
+            <button class="active" data-management-section="overview">
+              <i data-lucide="gauge"></i>
+              Aperçu
+            </button>
+            <button data-management-section="members">
+              <i data-lucide="users"></i>
+              Équipiers
+            </button>
+            <button data-management-section="products">
+              <i data-lucide="package"></i>
+              Produits
+            </button>
+            <button data-management-section="restock">
+              <i data-lucide="truck"></i>
+              Remplissage
+            </button>
+            <button data-management-section="inventory">
+              <i data-lucide="clipboard-list"></i>
+              Inventaire
+            </button>
+            <button data-management-section="history">
+              <i data-lucide="history"></i>
+              Historique
+            </button>
+          </aside>
+
+          <div class="management-content">
+            <section class="management-section active-management-section" data-section-panel="overview">
+              <div class="stats-grid" id="stats"></div>
+            </section>
+
+            <section class="panel management-section" data-section-panel="products">
+              <div class="panel-heading-actions">
+                <h3><i data-lucide="package"></i> Produits</h3>
+                <button id="open-product-form" class="primary-button" type="button">
+                  <i data-lucide="plus"></i>
+                  Ajouter un produit
+                </button>
+              </div>
+              <div id="product-list" class="table-list"></div>
+          </section>
+
+          <section class="panel management-section" data-section-panel="members">
+            <h3><i data-lucide="users"></i> Équipiers</h3>
+            <form id="member-form" class="inline-form">
+              <input name="name" required placeholder="Nom de l'équipier" />
+              <select name="group"></select>
+              <button class="primary-button" type="submit">
+                <i data-lucide="user-plus"></i>
+                Ajouter
+              </button>
+            </form>
+            <div id="member-list" class="table-list compact"></div>
+          </section>
+
+          <section class="panel management-section" data-section-panel="restock">
+            <h3><i data-lucide="truck"></i> Remplissage</h3>
+            <div id="restock-list" class="restock-table"></div>
+          </section>
+
+          <section class="panel management-section" data-section-panel="inventory">
+            <h3><i data-lucide="clipboard-list"></i> Inventaire</h3>
+            <form id="inventory-form" class="inventory-form">
+              <div id="inventory-products"></div>
+              <label>Argent compté<input name="cashCounted" type="number" min="0" step="0.01" value="0" /></label>
+              <label>Total feuille de crédit<input name="creditSheetTotal" type="number" min="0" step="0.01" value="0" /></label>
+              <button class="primary-button" type="submit">
+                <i data-lucide="check-circle"></i>
+                Clôturer l'inventaire
+              </button>
+            </form>
+            <div id="inventory-summary" class="summary-box"></div>
+          </section>
+
+            <section class="panel history-panel management-section" data-section-panel="history">
+              <h3><i data-lucide="history"></i> Historique récent</h3>
+              <div id="history-list" class="history-list"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="member-action-dialog">
+      <div class="dialog-form member-action-dialog">
+        <button id="member-action-close" class="icon-button dialog-close-button" type="button" aria-label="Fermer">
+          <i data-lucide="x"></i>
+        </button>
+        <div class="member-dialog-header">
+          <div>
+            <h3 id="member-dialog-name">Équipier</h3>
+            <p id="member-dialog-balance">Solde actuel: 0,00 €</p>
+          </div>
+        </div>
+
+        <div class="member-action-grid">
+          <button id="member-start-purchase" class="primary-button" type="button">
+            <i data-lucide="shopping-cart"></i>
+            Achat
+          </button>
+          <button id="member-credit-account" class="secondary-button" type="button">
+            <i data-lucide="coins"></i>
+            Créditer compte
+          </button>
+        </div>
+
+        <form id="member-credit-form" class="member-credit-form hidden">
+          <div class="quick-credit-grid" aria-label="Montants rapides">
+            <button type="button" data-credit-amount="5">5 €</button>
+            <button type="button" data-credit-amount="10">10 €</button>
+            <button type="button" data-credit-amount="20">20 €</button>
+          </div>
+          <label>Montant<input name="amount" type="number" min="0.01" step="0.01" required /></label>
+          <button class="primary-button" type="submit">
+            <i data-lucide="check"></i>
+            Enregistrer
+          </button>
+        </form>
+
+        <menu>
+        </menu>
+      </div>
+    </dialog>
+
+    <dialog id="product-dialog">
+      <form id="product-form" class="dialog-form">
+        <h3 id="product-dialog-title">Ajouter un produit</h3>
+        <div class="form-grid">
+          <input type="hidden" name="id" />
+          <label>Nom<input name="name" required placeholder="Coca, Pizza..." /></label>
+          <label>Prix<input name="price" type="number" min="0" step="0.01" required /></label>
+          <label>Catégorie
+            <select name="category">
+              <option value="drink">Boisson</option>
+              <option value="snack">Friandise</option>
+              <option value="frozen">Surgelé</option>
+            </select>
+          </label>
+          <label>Zone
+            <select name="location">
+              <option value="fridge">Frigo</option>
+              <option value="freezer">Congélateur</option>
+            </select>
+          </label>
+          <label>En rayon<input name="displayStock" type="number" min="0" step="1" required /></label>
+          <label>Réserve<input name="reserveStock" type="number" min="0" step="1" required /></label>
+        </div>
+        <menu>
+          <button class="secondary-button" type="button" id="cancel-product-edit">Annuler</button>
+          <button class="primary-button" type="submit">
+            <i data-lucide="save"></i>
+            Enregistrer
+          </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="purchase-dialog" class="purchase-dialog">
+      <div class="purchase-dialog-shell">
+        <section class="panel product-panel">
+          <div id="purchase-context" class="purchase-context"></div>
+          <div class="tabs" role="tablist" aria-label="Catégories">
+            <button class="active" data-category="all">Tout</button>
+            <button data-category="drink">Boissons</button>
+            <button data-category="snack">Friandises</button>
+            <button data-category="frozen">Surgelés</button>
+          </div>
+          <div id="kiosk-products" class="product-grid"></div>
+        </section>
+
+        <aside class="panel cart-panel">
+          <h3><i data-lucide="shopping-cart"></i> Panier</h3>
+          <div id="cart-items" class="cart-items empty">Aucun produit sélectionné</div>
+          <div class="cart-total">
+            <span>Total</span>
+            <strong id="cart-total">0,00 EUR</strong>
+          </div>
+          <div id="cash-change-panel" class="cash-change-panel hidden">
+            <label>Montant reçu<input id="cash-received" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+            <div class="change-result">
+              <span>Monnaie à rendre</span>
+              <strong id="cash-change">0,00 €</strong>
+            </div>
+            <button id="confirm-cash-checkout" class="primary-button" type="button">
+              <i data-lucide="check"></i>
+              Valider espèces
+            </button>
+          </div>
+          <div class="checkout-actions">
+            <button id="cash-checkout" class="primary-button">
+              <i data-lucide="banknote"></i>
+              Espèces
+            </button>
+            <button id="credit-checkout" class="primary-button accent">
+              <i data-lucide="credit-card"></i>
+              Crédit
+            </button>
+            <button id="clear-cart" class="secondary-button">
+              <i data-lucide="trash-2"></i>
+              Vider le panier
+            </button>
+          </div>
+        </aside>
+      </div>
+    </dialog>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

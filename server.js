@@ -1,0 +1,188 @@
+const http = require("node:http");
+const { randomUUID } = require("node:crypto");
+const { mkdir, readFile, writeFile } = require("node:fs/promises");
+const path = require("node:path");
+
+const requestedPort = Number(process.argv[2] || process.env.PORT);
+const PORT = Number.isInteger(requestedPort) && requestedPort > 0 ? requestedPort : 4173;
+const ROOT = __dirname;
+const DATA_DIR = path.join(ROOT, "data");
+const DATA_FILE = path.join(DATA_DIR, "frigo-state.json");
+
+const memberGroups = {
+  chauffeur: "Chauffeur",
+  maintenance: "Maintenance",
+  cadre: "Cadre",
+  photograveur: "Photograveur",
+  depart: "Départ",
+  roto: "Roto",
+  autre: "Autre",
+};
+
+const demoState = {
+  products: [
+    { id: randomUUID(), name: "Coca", price: 1.2, category: "drink", location: "fridge", displayStock: 12, reserveStock: 24 },
+    { id: randomUUID(), name: "Eau petillante", price: 0.8, category: "drink", location: "fridge", displayStock: 10, reserveStock: 18 },
+    { id: randomUUID(), name: "Barre chocolat", price: 1, category: "snack", location: "fridge", displayStock: 15, reserveStock: 20 },
+    { id: randomUUID(), name: "Pizza", price: 3.5, category: "frozen", location: "freezer", displayStock: 6, reserveStock: 12 },
+    { id: randomUUID(), name: "Glace", price: 1.5, category: "frozen", location: "freezer", displayStock: 8, reserveStock: 16 },
+  ],
+  members: [
+    { id: randomUUID(), name: "Alex", group: "chauffeur", balance: 0 },
+    { id: randomUUID(), name: "Camille", group: "maintenance", balance: 0 },
+    { id: randomUUID(), name: "Sam", group: "roto", balance: 0 },
+  ],
+  transactions: [],
+  inventories: [],
+  lastInventoryAt: null,
+};
+
+const staticFiles = new Map([
+  ["/", { file: "index.html", type: "text/html; charset=utf-8" }],
+  ["/kiosque", { file: "index.html", type: "text/html; charset=utf-8" }],
+  ["/gestion", { file: "index.html", type: "text/html; charset=utf-8" }],
+  ["/index.html", { file: "index.html", type: "text/html; charset=utf-8" }],
+  ["/styles.css", { file: "styles.css", type: "text/css; charset=utf-8" }],
+  ["/app.js", { file: "app.js", type: "text/javascript; charset=utf-8" }],
+]);
+
+function normalizeState(nextState) {
+  const state = {
+    ...demoState,
+    ...nextState,
+    products: Array.isArray(nextState?.products) ? nextState.products : [],
+    members: Array.isArray(nextState?.members) ? nextState.members : [],
+    transactions: Array.isArray(nextState?.transactions) ? nextState.transactions : [],
+    inventories: Array.isArray(nextState?.inventories) ? nextState.inventories : [],
+    lastInventoryAt: nextState?.lastInventoryAt ?? null,
+  };
+
+  state.products = state.products.map((product) => ({
+    id: product.id || randomUUID(),
+    name: String(product.name || "Produit").trim(),
+    price: Number(product.price) || 0,
+    category: ["drink", "snack", "frozen"].includes(product.category) ? product.category : "drink",
+    location: ["fridge", "freezer"].includes(product.location) ? product.location : "fridge",
+    displayStock: Math.max(0, Number(product.displayStock) || 0),
+    reserveStock: Math.max(0, Number(product.reserveStock) || 0),
+  }));
+
+  state.members = state.members.map((member) => ({
+    id: member.id || randomUUID(),
+    name: String(member.name || "Équipier").trim(),
+    group: memberGroups[member.group] ? member.group : "autre",
+    balance: Number(member.balance) || 0,
+  }));
+
+  return state;
+}
+
+async function readState() {
+  try {
+    const raw = await readFile(DATA_FILE, "utf8");
+    return normalizeState(JSON.parse(raw));
+  } catch {
+    const state = normalizeState(demoState);
+    await writeState(state);
+    return state;
+  }
+}
+
+async function writeState(state) {
+  await mkdir(DATA_DIR, { recursive: true });
+  await writeFile(DATA_FILE, `${JSON.stringify(normalizeState(state), null, 2)}\n`, "utf8");
+}
+
+function sendJson(response, statusCode, payload) {
+  response.writeHead(statusCode, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+  });
+  response.end(JSON.stringify(payload));
+}
+
+function readRequestBody(request) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    request.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 2_000_000) {
+        request.destroy();
+        reject(new Error("Payload too large"));
+      }
+    });
+    request.on("end", () => resolve(body));
+    request.on("error", reject);
+  });
+}
+
+async function handleApi(request, response) {
+  if (request.url !== "/api/state") {
+    sendJson(response, 404, { error: "Route inconnue" });
+    return;
+  }
+
+  if (request.method === "GET") {
+    sendJson(response, 200, await readState());
+    return;
+  }
+
+  if (request.method === "PUT") {
+    try {
+      const body = await readRequestBody(request);
+      const state = normalizeState(JSON.parse(body));
+      await writeState(state);
+      sendJson(response, 200, { ok: true });
+    } catch {
+      sendJson(response, 400, { error: "Données invalides" });
+    }
+    return;
+  }
+
+  sendJson(response, 405, { error: "Méthode non autorisée" });
+}
+
+async function handleStatic(request, response) {
+  const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
+  const target = staticFiles.get(pathname);
+
+  if (!target) {
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Fichier introuvable");
+    return;
+  }
+
+  const body = await readFile(path.join(ROOT, target.file));
+  response.writeHead(200, {
+    "Content-Type": target.type,
+    "Cache-Control": "no-store",
+  });
+  response.end(body);
+}
+
+const server = http.createServer(async (request, response) => {
+  try {
+    if (request.url.startsWith("/api/")) {
+      await handleApi(request, response);
+      return;
+    }
+    await handleStatic(request, response);
+  } catch (error) {
+    console.error(error);
+    sendJson(response, 500, { error: "Erreur serveur" });
+  }
+});
+
+server.on("error", (error) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`Le port ${PORT} est deja utilise. Essayez: npm run dev -- ${PORT + 1}`);
+    process.exit(1);
+  }
+
+  console.error(error);
+  process.exit(1);
+});
+
+server.listen(PORT, () => {
+  console.log(`Frigo Equipe prêt sur http://localhost:${PORT}`);
+});
