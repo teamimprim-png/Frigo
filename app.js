@@ -13,6 +13,11 @@ const categoryShort = {
   frozen: "SU",
 };
 
+const defaultCategoryPrices = {
+  drink: 0.8,
+  snack: 0.6,
+};
+
 const locations = {
   fridge: "Frigo",
   freezer: "Congelateur",
@@ -30,9 +35,9 @@ const memberGroups = {
 
 const demoState = {
   products: [
-    { id: crypto.randomUUID(), name: "Coca", price: 1.2, category: "drink", location: "fridge", displayStock: 12, reserveStock: 24 },
+    { id: crypto.randomUUID(), name: "Coca", price: defaultCategoryPrices.drink, category: "drink", location: "fridge", displayStock: 12, reserveStock: 24 },
     { id: crypto.randomUUID(), name: "Eau petillante", price: 0.8, category: "drink", location: "fridge", displayStock: 10, reserveStock: 18 },
-    { id: crypto.randomUUID(), name: "Barre chocolat", price: 1, category: "snack", location: "fridge", displayStock: 15, reserveStock: 20 },
+    { id: crypto.randomUUID(), name: "Barre chocolat", price: defaultCategoryPrices.snack, category: "snack", location: "fridge", displayStock: 15, reserveStock: 20 },
     { id: crypto.randomUUID(), name: "Pizza", price: 3.5, category: "frozen", location: "freezer", displayStock: 6, reserveStock: 12 },
     { id: crypto.randomUUID(), name: "Glace", price: 1.5, category: "frozen", location: "freezer", displayStock: 8, reserveStock: 16 },
   ],
@@ -78,12 +83,9 @@ async function loadState() {
   try {
     const response = await fetch(API_STATE_URL, { headers: { Accept: "application/json" } });
     if (response.ok) {
-      setSyncStatus("Données serveur chargées", "ok");
       return normalizeState(await response.json());
     }
-  } catch {
-    setSyncStatus("Mode local", "warning");
-  }
+  } catch {}
 
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return normalizeState(structuredClone(demoState));
@@ -123,17 +125,9 @@ async function saveState() {
     });
 
     if (!response.ok) throw new Error("Server rejected state");
-    setSyncStatus("Synchronisé", "ok");
   } catch {
-    setSyncStatus("Sauvegarde locale", "warning");
+    // Local storage already contains the latest state as a fallback.
   }
-}
-
-function setSyncStatus(message, tone = "neutral") {
-  const node = $("#sync-status");
-  if (!node) return;
-  node.textContent = message;
-  node.dataset.tone = tone;
 }
 
 function formatMoney(value) {
@@ -142,6 +136,14 @@ function formatMoney(value) {
 
 function formatDate(value) {
   return dateFormatter.format(new Date(value));
+}
+
+function escapeAttribute(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }
 
 function getAvatarColor(name) {
@@ -693,37 +695,104 @@ function renderProductManagement() {
     return;
   }
 
-  state.products.forEach((product) => {
-    const row = document.createElement("div");
-    row.className = "table-row product-manage-row";
-    row.innerHTML = `
-      <div class="row-info">
-        <div class="row-title">
-          <strong>${product.name}</strong>
-          <span class="pill-category category-${product.category}">${categories[product.category]}</span>
-        </div>
-        <div class="row-meta">
-          <span><i data-lucide="tag"></i> ${formatMoney(product.price)}</span>
-          <span><i data-lucide="map-pin"></i> ${locations[product.location]}</span>
-          <span><i data-lucide="layout-grid"></i> Rayon: <strong>${product.displayStock}</strong></span>
-          <span><i data-lucide="archive"></i> Réserve: <strong>${product.reserveStock}</strong></span>
-        </div>
+  const categoryOrder = ["drink", "snack", "frozen"];
+  list.classList.add("stock-columns");
+
+  categoryOrder.forEach((category) => {
+    const column = document.createElement("section");
+    column.className = "stock-category-column";
+    column.innerHTML = `
+      <h4>${categories[category]}</h4>
+      <div class="stock-category-items"></div>
+    `;
+    const items = column.querySelector(".stock-category-items");
+    const products = state.products
+      .filter((product) => product.category === category)
+      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+    if (!products.length) {
+      items.innerHTML = "<p class='empty-placeholder'>Aucun article.</p>";
+      list.append(column);
+      return;
+    }
+
+    products.forEach((product) => {
+      const row = document.createElement("div");
+      row.className = "table-row product-manage-row";
+      row.innerHTML = `
+      <div class="product-name-cell">
+        <strong>${product.name}</strong>
+        <span class="pill-category category-${product.category}">${categories[product.category]}</span>
       </div>
+      <label class="reserve-inline-field">
+        <i data-lucide="archive"></i>
+        <span>Réserve</span>
+        <input class="reserve-edit-input" data-product-id="${product.id}" type="number" min="0" step="1" value="${product.reserveStock}" inputmode="numeric" />
+      </label>
       <div class="row-actions">
-        <button class="secondary-button" data-action="edit" title="Modifier">
-          <i data-lucide="edit-2"></i>
-          <span>Modifier</span>
+        <button class="product-edit-button" data-action="edit" type="button" title="Modifier ${escapeAttribute(product.name)}" aria-label="Modifier ${escapeAttribute(product.name)}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+          </svg>
         </button>
-        <button class="danger-button" data-action="delete" title="Supprimer">
-          <i data-lucide="trash-2"></i>
-          <span>Supprimer</span>
+        <button class="product-delete-button" data-action="delete" type="button" title="Supprimer ${escapeAttribute(product.name)}" aria-label="Supprimer ${escapeAttribute(product.name)}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4h8v2"></path>
+            <path d="M19 6l-1 14H6L5 6"></path>
+            <path d="M10 11v6"></path>
+            <path d="M14 11v6"></path>
+          </svg>
         </button>
       </div>
     `;
-    row.querySelector('[data-action="edit"]').addEventListener("click", () => editProduct(product.id));
-    row.querySelector('[data-action="delete"]').addEventListener("click", () => deleteProduct(product.id));
-    list.append(row);
+      const reserveInput = row.querySelector(".reserve-edit-input");
+      reserveInput.addEventListener("focus", handleReserveFieldFocus);
+      reserveInput.addEventListener("keydown", handleReserveFieldKeyboard);
+      reserveInput.addEventListener("change", updateReserveStock);
+      reserveInput.addEventListener("blur", updateReserveStock);
+      row.querySelector('[data-action="edit"]').addEventListener("click", () => editProduct(product.id));
+      row.querySelector('[data-action="delete"]').addEventListener("click", () => deleteProduct(product.id));
+      items.append(row);
+    });
+
+    list.append(column);
   });
+}
+
+function handleReserveFieldFocus(event) {
+  if (event.currentTarget.select) event.currentTarget.select();
+}
+
+function handleReserveFieldKeyboard(event) {
+  const inputs = $$(".reserve-edit-input");
+  const currentIndex = inputs.indexOf(event.currentTarget);
+  let nextIndex = null;
+
+  if (event.key === "ArrowDown" || event.key === "Enter") nextIndex = currentIndex + 1;
+  if (event.key === "ArrowUp") nextIndex = currentIndex - 1;
+
+  if (nextIndex === null) return;
+  event.preventDefault();
+  updateReserveStock(event);
+  const next = inputs[Math.max(0, Math.min(nextIndex, inputs.length - 1))];
+  next?.focus();
+  if (next?.select) next.select();
+}
+
+function updateReserveStock(event) {
+  const input = event.currentTarget;
+  const product = state.products.find((candidate) => candidate.id === input.dataset.productId);
+  if (!product) return;
+
+  const value = Math.max(0, Math.floor(Number(input.value) || 0));
+  input.value = value;
+  if (product.reserveStock === value) return;
+  product.reserveStock = value;
+  saveState();
+  renderStats();
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function editProduct(id) {
@@ -741,9 +810,18 @@ function openProductForm() {
   const form = $("#product-form");
   form.reset();
   form.elements.id.value = "";
-  $("#product-dialog-title").textContent = "Ajouter un produit";
+  form.elements.price.value = defaultCategoryPrices[form.elements.category.value] ?? "";
+  $("#product-dialog-title").textContent = "Ajouter au stock";
   $("#product-dialog").showModal();
   form.elements.name.focus();
+}
+
+function applyDefaultProductPrice() {
+  const form = $("#product-form");
+  if (form.elements.id.value) return;
+  const defaultPrice = defaultCategoryPrices[form.elements.category.value];
+  if (defaultPrice === undefined) return;
+  form.elements.price.value = defaultPrice.toFixed(2);
 }
 
 function deleteProduct(id) {
@@ -770,30 +848,43 @@ function renderMemberManagement() {
   }
 
   state.members.forEach((member) => {
-    const row = document.createElement("div");
-    row.className = "table-row member-manage-row";
-    row.innerHTML = `
-      <div class="row-info">
-        <div class="member-manage-header">
-          <span class="avatar mini" style="background: ${getAvatarColor(member.name)}">${member.name.slice(0, 2).toUpperCase()}</span>
-          <strong>${member.name}</strong>
-          <span class="member-group-pill">${memberGroups[member.group]}</span>
-        </div>
-        <div class="row-meta">
-          <span class="${memberBalanceClass(member)}">
-            <i data-lucide="credit-card"></i>
-            Solde: <strong>${memberBalanceLabel(member)}</strong>
-          </span>
+    const card = document.createElement("article");
+    card.className = "member-card member-manage-card";
+    card.classList.toggle("has-debt", member.balance > 0);
+    card.classList.toggle("has-prepaid", member.balance < 0);
+    card.innerHTML = `
+      <div class="member-manage-top">
+        <div class="member-details">
+          <div class="member-manage-title">
+            <strong>${member.name}</strong>
+            <div class="member-manage-tools">
+              <button class="member-edit-button" type="button" title="Modifier ${member.name}" aria-label="Modifier ${member.name}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                </svg>
+              </button>
+              <button class="member-delete-button" type="button" title="Supprimer ${member.name}" aria-label="Supprimer ${member.name}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M3 6h18"></path>
+                  <path d="M8 6V4h8v2"></path>
+                  <path d="M19 6l-1 14H6L5 6"></path>
+                  <path d="M10 11v6"></path>
+                  <path d="M14 11v6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <span class="member-group-text">${memberGroups[member.group]}</span>
         </div>
       </div>
-      <div class="row-actions">
-        <button class="danger-button" title="Supprimer">
-          <i data-lucide="trash-2"></i>
-          <span>Supprimer</span>
-        </button>
+      <div class="member-manage-balance">
+        <i data-lucide="credit-card"></i>
+        <span class="member-balance ${memberBalanceClass(member)}">${memberBalanceLabel(member)}</span>
       </div>
     `;
-    row.querySelector("button").addEventListener("click", () => {
+    card.querySelector(".member-edit-button").addEventListener("click", () => editMember(member.id));
+    card.querySelector(".member-delete-button").addEventListener("click", () => {
       if (!confirm(`Supprimer ${member.name} ?`)) return;
       state.members = state.members.filter((candidate) => candidate.id !== member.id);
       if (selectedMemberId === member.id) selectedMemberId = state.members[0]?.id ?? null;
@@ -802,12 +893,47 @@ function renderMemberManagement() {
       saveState();
       render();
     });
-    list.append(row);
+    list.append(card);
   });
+}
+
+function editMember(id) {
+  const member = state.members.find((candidate) => candidate.id === id);
+  if (!member) return;
+
+  const form = $("#member-edit-form");
+  form.elements.id.value = member.id;
+  form.elements.name.value = member.name;
+  form.elements.group.value = memberGroups[member.group] ? member.group : "autre";
+  $("#member-edit-dialog").showModal();
+  form.elements.name.focus();
+}
+
+function submitMemberEdit(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const member = state.members.find((candidate) => candidate.id === form.elements.id.value);
+  if (!member) return;
+
+  const name = form.elements.name.value.trim();
+  if (!name) return;
+
+  member.name = name;
+  member.group = memberGroups[form.elements.group.value] ? form.elements.group.value : "autre";
+  state.transactions.forEach((transaction) => {
+    if (transaction.memberId === member.id) transaction.memberName = member.name;
+  });
+  saveState();
+  form.reset();
+  $("#member-edit-dialog").close();
+  render();
+  toast("Équipier modifié.");
 }
 
 function renderRestock() {
   const list = $("#restock-list");
+  list.innerHTML = "";
+
   if (!state.products.length) {
     list.innerHTML = `
       <div class="empty-list-placeholder">
@@ -818,43 +944,67 @@ function renderRestock() {
     return;
   }
 
-  list.innerHTML = `
-    <div class="restock-header">
-      <span>Produit</span>
-      <span>Rayon</span>
-      <span>Réserve</span>
-      <span>À transférer</span>
-      <span>Action</span>
-    </div>
-    ${state.products
-      .slice()
-      .sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name, "fr"))
-      .map((product) => `
-      <div class="restock-row ${product.displayStock <= 2 ? "needs-restock" : ""}" data-product-id="${product.id}">
+  const categoryOrder = ["drink", "snack", "frozen"];
+  list.classList.add("stock-columns");
+
+  categoryOrder.forEach((category) => {
+    const column = document.createElement("section");
+    column.className = "stock-category-column";
+    column.innerHTML = `
+      <h4>${categories[category]}</h4>
+      <div class="stock-category-items"></div>
+    `;
+    const items = column.querySelector(".stock-category-items");
+    const products = state.products
+      .filter((product) => product.category === category)
+      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+    if (!products.length) {
+      items.innerHTML = "<p class='empty-placeholder'>Aucun article.</p>";
+      list.append(column);
+      return;
+    }
+
+    products.forEach((product) => {
+      const row = document.createElement("div");
+      row.className = `table-row restock-row ${product.displayStock <= 2 ? "needs-restock" : ""}`;
+      row.dataset.productId = product.id;
+      row.innerHTML = `
         <div class="row-info">
-          <strong>${product.name}</strong>
+          <div class="row-title">
+            <strong>${product.name}</strong>
+            <span class="pill-category category-${product.category}">${categories[product.category]}</span>
+          </div>
           <div class="row-meta">
-            <span><i data-lucide="map-pin"></i> ${locations[product.location]}</span>
-            <span><i data-lucide="tag"></i> ${categories[product.category]}</span>
+            <span class="${product.displayStock <= 2 ? "danger" : ""}">
+              <i data-lucide="refrigerator"></i>
+              Frigo: <strong>${product.displayStock}</strong>
+            </span>
+            <span>
+              <i data-lucide="archive"></i>
+              Réserve: <strong>${product.reserveStock}</strong>
+            </span>
           </div>
         </div>
-        <strong class="${product.displayStock <= 2 ? "danger" : ""}">${product.displayStock}</strong>
-        <strong>${product.reserveStock}</strong>
-        <input class="restock-quantity" type="number" min="0" max="${product.reserveStock}" step="1" inputmode="numeric" data-product-id="${product.id}" ${product.reserveStock <= 0 ? "disabled" : ""} />
-        <button class="secondary-button restock-line-button" type="button" data-product-id="${product.id}" ${product.reserveStock <= 0 ? "disabled" : ""}>
+        <label class="restock-transfer-field">
           <i data-lucide="arrow-right-left"></i>
-          Transférer
-        </button>
-      </div>
-    `).join("")}
-  `;
+          <span>À transférer</span>
+          <input class="restock-quantity" type="number" min="0" max="${product.reserveStock}" step="1" inputmode="numeric" data-product-id="${product.id}" ${product.reserveStock <= 0 ? "disabled" : ""} />
+        </label>
+        <div class="row-actions">
+          <button class="restock-transfer-button" type="button" data-product-id="${product.id}" title="Transférer ${escapeAttribute(product.name)}" aria-label="Transférer ${escapeAttribute(product.name)}" ${product.reserveStock <= 0 ? "disabled" : ""}>
+            <i data-lucide="arrow-right-left"></i>
+          </button>
+        </div>
+      `;
+      row.querySelector(".restock-transfer-button").addEventListener("click", () => restockProductFromRow(product.id));
+      const input = row.querySelector(".restock-quantity");
+      input.addEventListener("focus", (event) => event.currentTarget.select());
+      input.addEventListener("keydown", handleRestockKeyboard);
+      items.append(row);
+    });
 
-  $$(".restock-line-button").forEach((button) => {
-    button.addEventListener("click", () => restockProductFromRow(button.dataset.productId));
-  });
-
-  $$(".restock-quantity").forEach((input) => {
-    input.addEventListener("keydown", handleRestockKeyboard);
+    list.append(column);
   });
 }
 
@@ -1299,25 +1449,23 @@ function bindEvents() {
   });
   $("#open-product-form").addEventListener("click", openProductForm);
   $("#product-form").addEventListener("submit", submitProduct);
+  $("#product-form").elements.category.addEventListener("change", applyDefaultProductPrice);
+  $("#member-edit-form").addEventListener("submit", submitMemberEdit);
   $("#member-form").addEventListener("submit", submitMember);
   $("#kiosk-member-form").addEventListener("submit", addMemberFromKiosk);
   $("#inventory-form").addEventListener("submit", submitInventory);
   $("#export-data").addEventListener("click", exportData);
+  $("#import-data-button").addEventListener("click", () => $("#import-data").click());
   $("#import-data").addEventListener("change", importData);
   $("#cancel-product-edit").addEventListener("click", () => {
     $("#product-form").reset();
     $("#product-form").elements.id.value = "";
     $("#product-dialog").close();
   });
-  $("#reset-demo").addEventListener("click", () => {
-    if (!confirm("Reinitialiser avec les donnees de demonstration ?")) return;
-    state = structuredClone(demoState);
-    selectedMemberId = state.members[0]?.id ?? null;
-    actionMemberId = null;
-    purchaseMode = false;
-    cart = [];
-    saveState();
-    render();
+  $("#cancel-member-edit").addEventListener("click", () => {
+    $("#member-edit-form").reset();
+    $("#member-edit-form").elements.id.value = "";
+    $("#member-edit-dialog").close();
   });
 }
 

@@ -33,17 +33,11 @@
           </button>
         </form>
       </div>
-      <div id="sync-status" class="sync-status" data-tone="neutral">Chargement</div>
     </header>
 
     <main>
       <section id="kiosk" class="view active-view" aria-labelledby="kiosk-title">
-        <div class="section-heading">
-          <div>
-            <h2 id="kiosk-title">Kiosque tactile</h2>
-            <p>Sélectionnez un équipier, ajoutez les produits, puis encaissez ou mettez en crédit.</p>
-          </div>
-        </div>
+        
 
         <div class="kiosk-layout">
           <aside class="panel">
@@ -69,21 +63,6 @@
             <h2 id="management-title">Gestion</h2>
             <p>Stocks, remplissage, inventaires, caisse et crédits.</p>
           </div>
-          <div class="toolbar">
-            <button id="export-data" class="secondary-button">
-              <i data-lucide="download"></i>
-              Exporter
-            </button>
-            <label class="file-button">
-              <i data-lucide="upload"></i>
-              Importer
-              <input id="import-data" type="file" accept="application/json" />
-            </label>
-            <button id="reset-demo" class="danger-button">
-              <i data-lucide="rotate-ccw"></i>
-              Réinitialiser
-            </button>
-          </div>
         </div>
 
         <div class="management-shell">
@@ -98,7 +77,7 @@
             </button>
             <button data-management-section="products">
               <i data-lucide="package"></i>
-              Produits
+              Stock
             </button>
             <button data-management-section="restock">
               <i data-lucide="truck"></i>
@@ -112,6 +91,17 @@
               <i data-lucide="history"></i>
               Historique
             </button>
+            <div class="management-sidebar-actions">
+              <button id="export-data" class="sidebar-file-action" type="button">
+                <i data-lucide="download"></i>
+                Exporter
+              </button>
+              <button id="import-data-button" class="sidebar-file-action" type="button">
+                <i data-lucide="upload"></i>
+                Importer
+              </button>
+              <input id="import-data" class="hidden-file-input" type="file" accept="application/json" />
+            </div>
           </aside>
 
           <div class="management-content">
@@ -121,10 +111,10 @@
 
             <section class="panel management-section" data-section-panel="products">
               <div class="panel-heading-actions">
-                <h3><i data-lucide="package"></i> Produits</h3>
+                <h3><i data-lucide="package"></i> Stock</h3>
                 <button id="open-product-form" class="primary-button" type="button">
                   <i data-lucide="plus"></i>
-                  Ajouter un produit
+                  Ajouter au stock
                 </button>
               </div>
               <div id="product-list" class="table-list"></div>
@@ -132,7 +122,7 @@
 
           <section class="panel management-section" data-section-panel="members">
             <h3><i data-lucide="users"></i> Équipiers</h3>
-            <form id="member-form" class="inline-form">
+            <form id="member-form" class="inline-form hidden" aria-hidden="true">
               <input name="name" required placeholder="Nom de l'équipier" />
               <select name="group"></select>
               <button class="primary-button" type="submit">
@@ -140,7 +130,7 @@
                 Ajouter
               </button>
             </form>
-            <div id="member-list" class="table-list compact"></div>
+            <div id="member-list" class="table-list compact member-management-grid"></div>
           </section>
 
           <section class="panel management-section" data-section-panel="restock">
@@ -214,7 +204,7 @@
 
     <dialog id="product-dialog">
       <form id="product-form" class="dialog-form">
-        <h3 id="product-dialog-title">Ajouter un produit</h3>
+        <h3 id="product-dialog-title">Ajouter au stock</h3>
         <div class="form-grid">
           <input type="hidden" name="id" />
           <label>Nom<input name="name" required placeholder="Coca, Pizza..." /></label>
@@ -232,11 +222,29 @@
               <option value="freezer">Congélateur</option>
             </select>
           </label>
-          <label>En rayon<input name="displayStock" type="number" min="0" step="1" required /></label>
+          <label>Dans le frigo<input name="displayStock" type="number" min="0" step="1" required /></label>
           <label>Réserve<input name="reserveStock" type="number" min="0" step="1" required /></label>
         </div>
         <menu>
           <button class="secondary-button" type="button" id="cancel-product-edit">Annuler</button>
+          <button class="primary-button" type="submit">
+            <i data-lucide="save"></i>
+            Enregistrer
+          </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="member-edit-dialog">
+      <form id="member-edit-form" class="dialog-form">
+        <h3>Modifier l'équipier</h3>
+        <div class="form-grid">
+          <input type="hidden" name="id" />
+          <label>Nom<input name="name" required placeholder="Nom de l'équipier" /></label>
+          <label>Catégorie<select name="group"></select></label>
+        </div>
+        <menu>
+          <button class="secondary-button" type="button" id="cancel-member-edit">Annuler</button>
           <button class="primary-button" type="submit">
             <i data-lucide="save"></i>
             Enregistrer
