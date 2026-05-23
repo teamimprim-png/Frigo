@@ -1,5 +1,7 @@
 const STORAGE_KEY = "frigo-equipe-v1";
 const API_STATE_URL = "/api/state";
+const SSE_URL = "/api/sse";
+let syncPaused = false;
 
 const categories = {
   drink: "Boisson",
@@ -76,7 +78,9 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 function activePage() {
-  return window.location.pathname === "/gestion" ? "management" : "kiosk";
+  if (window.location.pathname === "/gestion") return "management";
+  if (window.location.pathname === "/inventaire") return "inventaire";
+  return "kiosk";
 }
 
 async function loadState() {
@@ -115,6 +119,7 @@ function normalizeState(nextState) {
 }
 
 async function saveState() {
+  syncPaused = true;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
   try {
@@ -128,6 +133,7 @@ async function saveState() {
   } catch {
     // Local storage already contains the latest state as a fallback.
   }
+  setTimeout(() => { syncPaused = false; }, 300);
 }
 
 function formatMoney(value) {
@@ -178,6 +184,10 @@ function totalCredit() {
   return state.members.reduce((sum, member) => sum + Math.max(0, member.balance), 0);
 }
 
+function totalPrepaid() {
+  return state.members.reduce((sum, member) => sum + Math.max(0, -member.balance), 0);
+}
+
 function memberBalanceLabel(member) {
   if (member.balance > 0) return `Doit ${formatMoney(member.balance)}`;
   if (member.balance < 0) return `Avoir ${formatMoney(Math.abs(member.balance))}`;
@@ -211,6 +221,7 @@ function render() {
   renderMemberManagement();
   renderRestock();
   renderInventory();
+  renderInventoryMobile();
   renderHistory();
   renderMemberActionDialog();
   if (window.lucide) {
@@ -656,15 +667,22 @@ function recordPayment(memberId, amount) {
 }
 
 function renderStats() {
+  const credit = totalCredit();
+  const prepaid = totalPrepaid();
   const stockValue = state.products.reduce((sum, product) => sum + (product.displayStock + product.reserveStock) * product.price, 0);
-  const lowProducts = state.products.filter((product) => product.displayStock <= 2).length;
-  const expectedCash = periodExpectedCash();
+  const lowProducts = state.products.filter((product) => product.displayStock <= 2);
 
   const statsData = [
-    { label: "Caisse théorique", value: formatMoney(expectedCash), hint: "Depuis le dernier inventaire", icon: "wallet", class: "stat-cash" },
-    { label: "Crédits ouverts", value: formatMoney(totalCredit()), hint: "Total des équipiers", icon: "credit-card", class: "stat-credit" },
-    { label: "Valeur du stock", value: formatMoney(stockValue), hint: "Rayon et réserve", icon: "package", class: "stat-stock" },
-    { label: "Alertes stock", value: String(lowProducts), hint: "Produits à remplir (≤ 2)", icon: "alert-triangle", class: lowProducts > 0 ? "stat-alert danger" : "stat-alert" }
+    {
+      icon: "credit-card",
+      class: "stat-credit",
+      content: `
+        <span class="stat-label">Ardoise</span>
+        <span class="stat-diff" style="color: ${prepaid >= credit ? "#10b981" : "#e5485d"}">${prepaid >= credit ? "+" : "-"}${formatMoney(Math.abs(prepaid - credit))}</span>
+      `
+    },
+    { label: "Valeur du stock", value: formatMoney(stockValue), icon: "package", class: "stat-stock" },
+    { label: "Alertes stock", value: String(lowProducts.length), icon: "alert-triangle", class: lowProducts.length > 0 ? "stat-alert danger" : "stat-alert", items: lowProducts }
   ];
 
   $("#stats").innerHTML = statsData.map(stat => `
@@ -673,9 +691,11 @@ function renderStats() {
         <i data-lucide="${stat.icon}"></i>
       </div>
       <div class="stat-details">
-        <span class="stat-label">${stat.label}</span>
-        <strong>${stat.value}</strong>
-        <small>${stat.hint}</small>
+        ${stat.content || `
+          <span class="stat-label">${stat.label}</span>
+          <strong>${stat.value}</strong>
+        `}
+        ${stat.items ? `<div class="stat-items">${stat.items.map(p => `<span class="stat-item">${p.name} (${p.displayStock})</span>`).join("")}</div>` : ""}
       </div>
     </article>
   `).join("");
@@ -987,19 +1007,13 @@ function renderRestock() {
           </div>
         </div>
         <label class="restock-transfer-field">
-          <i data-lucide="arrow-right-left"></i>
-          <span>À transférer</span>
+          <span>Remis dans le frigo</span>
           <input class="restock-quantity" type="number" min="0" max="${product.reserveStock}" step="1" inputmode="numeric" data-product-id="${product.id}" ${product.reserveStock <= 0 ? "disabled" : ""} />
         </label>
-        <div class="row-actions">
-          <button class="restock-transfer-button" type="button" data-product-id="${product.id}" title="Transférer ${escapeAttribute(product.name)}" aria-label="Transférer ${escapeAttribute(product.name)}" ${product.reserveStock <= 0 ? "disabled" : ""}>
-            <i data-lucide="arrow-right-left"></i>
-          </button>
-        </div>
       `;
-      row.querySelector(".restock-transfer-button").addEventListener("click", () => restockProductFromRow(product.id));
       const input = row.querySelector(".restock-quantity");
       input.addEventListener("focus", (event) => event.currentTarget.select());
+      input.addEventListener("change", () => restockProductFromRow(product.id));
       input.addEventListener("keydown", handleRestockKeyboard);
       items.append(row);
     });
@@ -1008,20 +1022,81 @@ function renderRestock() {
   });
 }
 
+function currentPeriodSoldItems() {
+  return currentPeriodTransactions()
+    .filter((t) => t.type === "sale")
+    .reduce((sum, t) => sum + (t.lines ? t.lines.reduce((s, l) => s + l.quantity, 0) : 0), 0);
+}
+
+function updateInventorySummary() {
+  const adjusted = inventoryExpectedCash();
+  const stockAdjustment = adjusted - periodExpectedCash();
+  const sold = currentPeriodSoldItems();
+  $("#inventory-summary").innerHTML = `
+    <strong>Caisse theorique: ${formatMoney(adjusted)}</strong><br>
+    Credits suivis dans l'app: ${formatMoney(totalCredit())}
+    ${stockAdjustment > 0 ? `<br><span class="text-muted" style="font-size:0.78rem">Ajustement stock: +${formatMoney(stockAdjustment)}</span>` : ""}
+    <br>Articles vendus: <strong>${sold}</strong>
+  `;
+}
+
 function renderInventory() {
   const productFields = $("#inventory-products");
-  productFields.innerHTML = state.products.map((product) => `
-    <label>
-      ${product.name} (${locations[product.location]})
-      <input name="product-${product.id}" type="number" min="0" step="1" value="${product.displayStock + product.reserveStock}" />
-    </label>
-  `).join("");
+  productFields.innerHTML = "";
+  productFields.classList.add("table-list", "stock-columns");
 
-  const expectedCash = periodExpectedCash();
-  $("#inventory-summary").innerHTML = `
-    <strong>Caisse theorique: ${formatMoney(expectedCash)}</strong><br>
-    Credits suivis dans l'app: ${formatMoney(totalCredit())}
-  `;
+  const categoryOrder = ["drink", "snack", "frozen"];
+
+  categoryOrder.forEach((category) => {
+    const column = document.createElement("section");
+    column.className = "stock-category-column";
+    column.innerHTML = `
+      <h4>${categories[category]}</h4>
+      <div class="stock-category-items"></div>
+    `;
+    const items = column.querySelector(".stock-category-items");
+    const products = state.products
+      .filter((product) => product.category === category)
+      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+    if (!products.length) {
+      items.innerHTML = "<p class='empty-placeholder'>Aucun article.</p>";
+      productFields.append(column);
+      return;
+    }
+
+    products.forEach((product) => {
+      const total = product.displayStock + product.reserveStock;
+      const row = document.createElement("div");
+      row.className = "table-row inventory-row";
+      row.innerHTML = `
+        <div class="row-info">
+          <div class="row-title">
+            <strong>${product.name}</strong>
+            <span class="pill-category category-${product.category}">${categories[product.category]}</span>
+          </div>
+          <div class="row-meta">
+            <span>${locations[product.location]}</span>
+            <span>
+              Stock: <strong>${total}</strong>
+            </span>
+          </div>
+        </div>
+        <label class="inventory-count-field">
+          <span>Compté</span>
+          <input name="product-${product.id}" type="number" min="0" step="1" value="${total}" />
+        </label>
+      `;
+      const invInput = row.querySelector("input");
+      invInput.addEventListener("focus", (event) => event.currentTarget.select());
+      invInput.addEventListener("keydown", handleInventoryKeyboard);
+      items.append(row);
+    });
+
+    productFields.append(column);
+  });
+
+  updateInventorySummary();
 }
 
 function renderHistory() {
@@ -1251,10 +1326,46 @@ function handleRestockKeyboard(event) {
   }
 }
 
+function handleInventoryKeyboard(event) {
+  const inputs = $$(".inventory-count-field input:not(:disabled)");
+  const currentIndex = inputs.indexOf(event.currentTarget);
+
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    inputs[Math.min(currentIndex + 1, inputs.length - 1)]?.focus();
+    inputs[Math.min(currentIndex + 1, inputs.length - 1)]?.select();
+  }
+
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    inputs[Math.max(currentIndex - 1, 0)]?.focus();
+    inputs[Math.max(currentIndex - 1, 0)]?.select();
+  }
+
+  if (event.key === "Enter") {
+    event.preventDefault();
+    inputs[Math.min(currentIndex + 1, inputs.length - 1)]?.focus();
+    inputs[Math.min(currentIndex + 1, inputs.length - 1)]?.select();
+  }
+}
+
+function inventoryExpectedCash() {
+  const form = $("#inventory-form");
+  let stockAdjustment = 0;
+  state.products.forEach((product) => {
+    const previousTotal = product.displayStock + product.reserveStock;
+    const countedTotal = Number(form.elements[`product-${product.id}`]?.value || previousTotal);
+    if (countedTotal < previousTotal) {
+      stockAdjustment += (previousTotal - countedTotal) * product.price;
+    }
+  });
+  return periodExpectedCash() + stockAdjustment;
+}
+
 function submitInventory(event) {
   event.preventDefault();
   const form = event.currentTarget;
-  const expectedCash = periodExpectedCash();
+  const expectedCash = inventoryExpectedCash();
   const expectedCredit = totalCredit();
   const cashCounted = Number(form.elements.cashCounted.value);
   const creditSheetTotal = Number(form.elements.creditSheetTotal.value);
@@ -1295,6 +1406,171 @@ function submitInventory(event) {
   saveState();
   render();
   toast("Inventaire cloture.");
+}
+
+function renderInventoryMobile() {
+  if (activePage() !== "inventaire") return;
+  const container = $("#inv-mobile-products");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!state.products.length) {
+    container.innerHTML = `
+      <div class="empty-list-placeholder">
+        <i data-lucide="package-x"></i>
+        <p>Aucun produit enregistré.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const categoryOrder = ["drink", "snack", "frozen"];
+  const categoryIcons = { drink: "cup-soda", snack: "cookie", frozen: "snowflake" };
+
+  categoryOrder.forEach((category) => {
+    const products = state.products
+      .filter((p) => p.category === category)
+      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+    if (!products.length) return;
+
+    const section = document.createElement("section");
+    section.className = `inv-mobile-category category-${category}`;
+    section.innerHTML = `
+      <h3>
+        <i data-lucide="${categoryIcons[category]}"></i>
+        ${categories[category]}
+      </h3>
+      <div class="inv-mobile-items"></div>
+    `;
+    const items = section.querySelector(".inv-mobile-items");
+
+    products.forEach((product) => {
+      const total = product.displayStock + product.reserveStock;
+      const row = document.createElement("div");
+      row.className = "inv-mobile-row";
+      row.innerHTML = `
+        <div class="inv-row-info">
+          <strong>${product.name}</strong>
+          <div class="inv-row-meta">
+            <span>${locations[product.location]}</span>
+            <span>Stock: <strong>${total}</strong></span>
+          </div>
+        </div>
+        <div class="inv-row-controls">
+          <button type="button" class="inv-qty-btn inv-dec" data-product-id="${product.id}" aria-label="Diminuer">−</button>
+          <input name="product-${product.id}" type="number" min="0" step="1" value="${total}" inputmode="numeric" />
+          <button type="button" class="inv-qty-btn inv-inc" data-product-id="${product.id}" aria-label="Augmenter">+</button>
+        </div>
+      `;
+      const input = row.querySelector("input");
+      input.addEventListener("focus", (e) => e.currentTarget.select());
+      input.addEventListener("change", () => updateInventoryMobileSummary());
+      row.querySelector(".inv-dec").addEventListener("click", () => {
+        const val = Number(input.value);
+        if (val > 0) input.value = val - 1;
+        input.dispatchEvent(new Event("change"));
+      });
+      row.querySelector(".inv-inc").addEventListener("click", () => {
+        input.value = (Number(input.value) || 0) + 1;
+        input.dispatchEvent(new Event("change"));
+      });
+      items.append(row);
+    });
+
+    container.append(section);
+  });
+
+  updateInventoryMobileSummary();
+}
+
+function updateInventoryMobileSummary() {
+  const form = $("#inventory-mobile-form");
+  const summary = $("#inv-mobile-summary");
+  if (!form || !summary) return;
+
+  let stockAdjustment = 0;
+  state.products.forEach((product) => {
+    const previousTotal = product.displayStock + product.reserveStock;
+    const countedTotal = Number(form.elements[`product-${product.id}`]?.value || previousTotal);
+    if (countedTotal < previousTotal) {
+      stockAdjustment += (previousTotal - countedTotal) * product.price;
+    }
+  });
+
+  const expected = periodExpectedCash() + stockAdjustment;
+  const sold = currentPeriodSoldItems();
+
+  summary.innerHTML = `
+    <div class="inv-summary-row">
+      <span>Caisse théorique</span>
+      <strong>${formatMoney(expected)}</strong>
+    </div>
+    <div class="inv-summary-row">
+      <span>Crédits suivis</span>
+      <strong>${formatMoney(totalCredit())}</strong>
+    </div>
+    ${stockAdjustment > 0 ? `
+    <div class="inv-summary-row text-muted">
+      <span>Ajustement stock</span>
+      <strong>+${formatMoney(stockAdjustment)}</strong>
+    </div>` : ""}
+    <div class="inv-summary-row text-muted">
+      <span>Articles vendus</span>
+      <strong>${sold}</strong>
+    </div>
+  `;
+}
+
+function submitInventoryMobile(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const expectedCash = periodExpectedCash();
+  let stockAdjustment = 0;
+  const countedProducts = [];
+
+  state.products.forEach((product) => {
+    const previousTotal = product.displayStock + product.reserveStock;
+    const countedTotal = Number(form.elements[`product-${product.id}`].value);
+    if (countedTotal < previousTotal) {
+      stockAdjustment += (previousTotal - countedTotal) * product.price;
+    }
+    countedProducts.push({
+      productId: product.id,
+      name: product.name,
+      countedTotal,
+      previousTotal,
+      variance: countedTotal - previousTotal,
+    });
+    product.reserveStock = Math.max(0, countedTotal - product.displayStock);
+    if (countedTotal < product.displayStock) {
+      product.displayStock = countedTotal;
+      product.reserveStock = 0;
+    }
+  });
+
+  const adjustedExpected = expectedCash + stockAdjustment;
+  const cashCounted = Number(form.elements.cashCounted.value);
+  const creditSheetTotal = Number(form.elements.creditSheetTotal.value);
+
+  const inventory = {
+    id: crypto.randomUUID(),
+    type: "inventory",
+    expectedCash: adjustedExpected,
+    cashCounted,
+    cashVariance: cashCounted - adjustedExpected,
+    expectedCredit: totalCredit(),
+    creditSheetTotal,
+    creditVariance: creditSheetTotal - totalCredit(),
+    products: countedProducts,
+    createdAt: new Date().toISOString(),
+  };
+
+  state.inventories.unshift(inventory);
+  state.lastInventoryAt = inventory.createdAt;
+  saveState();
+  render();
+  toast("Inventaire clôturé.");
 }
 
 function submitMemberCredit(event) {
@@ -1454,6 +1730,9 @@ function bindEvents() {
   $("#member-form").addEventListener("submit", submitMember);
   $("#kiosk-member-form").addEventListener("submit", addMemberFromKiosk);
   $("#inventory-form").addEventListener("submit", submitInventory);
+  $("#inventory-form").addEventListener("input", updateInventorySummary);
+  $("#inventory-mobile-form").addEventListener("submit", submitInventoryMobile);
+  $("#inventory-mobile-form").addEventListener("input", updateInventoryMobileSummary);
   $("#export-data").addEventListener("click", exportData);
   $("#import-data-button").addEventListener("click", () => $("#import-data").click());
   $("#import-data").addEventListener("change", importData);
@@ -1474,6 +1753,21 @@ async function boot() {
   selectedMemberId = state.members[0]?.id ?? null;
   bindEvents();
   render();
+  listenStateSync();
+}
+
+function listenStateSync() {
+  const source = new EventSource(SSE_URL);
+  source.onmessage = async (event) => {
+    if (syncPaused) return;
+    const data = JSON.parse(event.data);
+    if (data.type === "state-updated") {
+      state = await loadState();
+      selectedMemberId = state.members[0]?.id ?? null;
+      render();
+    }
+  };
+  source.onerror = () => {};
 }
 
 boot();

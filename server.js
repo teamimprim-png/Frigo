@@ -3,6 +3,8 @@ const { randomUUID } = require("node:crypto");
 const { mkdir, readFile, writeFile } = require("node:fs/promises");
 const path = require("node:path");
 
+const sseClients = new Set();
+
 const requestedPort = Number(process.argv[2] || process.env.PORT);
 const PORT = Number.isInteger(requestedPort) && requestedPort > 0 ? requestedPort : 4173;
 const ROOT = __dirname;
@@ -41,6 +43,7 @@ const staticFiles = new Map([
   ["/", { file: "index.html", type: "text/html; charset=utf-8" }],
   ["/kiosque", { file: "index.html", type: "text/html; charset=utf-8" }],
   ["/gestion", { file: "index.html", type: "text/html; charset=utf-8" }],
+  ["/inventaire", { file: "index.html", type: "text/html; charset=utf-8" }],
   ["/index.html", { file: "index.html", type: "text/html; charset=utf-8" }],
   ["/styles.css", { file: "styles.css", type: "text/css; charset=utf-8" }],
   ["/app.js", { file: "app.js", type: "text/javascript; charset=utf-8" }],
@@ -116,7 +119,26 @@ function readRequestBody(request) {
   });
 }
 
+function broadcastStateChange() {
+  const data = JSON.stringify({ type: "state-updated", at: new Date().toISOString() });
+  for (const client of sseClients) {
+    client.write(`data: ${data}\n\n`);
+  }
+}
+
 async function handleApi(request, response) {
+  if (request.url === "/api/sse") {
+    response.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-store",
+      Connection: "keep-alive",
+    });
+    response.write(`data: ${JSON.stringify({ type: "connected" })}\n\n`);
+    sseClients.add(response);
+    request.on("close", () => sseClients.delete(response));
+    return;
+  }
+
   if (request.url !== "/api/state") {
     sendJson(response, 404, { error: "Route inconnue" });
     return;
@@ -132,6 +154,7 @@ async function handleApi(request, response) {
       const body = await readRequestBody(request);
       const state = normalizeState(JSON.parse(body));
       await writeState(state);
+      broadcastStateChange();
       sendJson(response, 200, { ok: true });
     } catch {
       sendJson(response, 400, { error: "Données invalides" });

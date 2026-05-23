@@ -159,6 +159,42 @@
           </div>
         </div>
       </section>
+      <section id="inventaire" class="view">
+        <div class="inv-mobile">
+          <header class="inv-mobile-header">
+            <a href="/kiosque" class="back-button" aria-label="Retour au kiosque">
+              <i data-lucide="arrow-left"></i>
+            </a>
+            <div>
+              <h2>Inventaire</h2>
+              <p>Comptez les produits dans le frigo et le congélateur</p>
+            </div>
+          </header>
+
+          <form id="inventory-mobile-form" class="inv-mobile-form">
+            <div id="inv-mobile-products"></div>
+
+            <section class="inv-mobile-cash">
+              <h3><i data-lucide="banknote"></i> Caisse & Crédits</h3>
+              <label>
+                <span>Argent compté</span>
+                <input name="cashCounted" type="number" min="0" step="0.01" value="0" inputmode="decimal" />
+              </label>
+              <label>
+                <span>Total feuille de crédit</span>
+                <input name="creditSheetTotal" type="number" min="0" step="0.01" value="0" inputmode="decimal" />
+              </label>
+            </section>
+
+            <div id="inv-mobile-summary" class="inv-mobile-summary"></div>
+
+            <button class="primary-button inv-submit-btn" type="submit">
+              <i data-lucide="check-circle"></i>
+              Clôturer l'inventaire
+            </button>
+          </form>
+        </div>
+      </section>
     </main>
 
     <dialog id="member-action-dialog">
