@@ -3246,8 +3246,9 @@ select:focus {
 }
 
 .product-card {
+  position: relative;
   min-height: 104px;
-  padding: 12px;
+  padding: 12px 12px 30px;
   border-color: var(--border);
   background: #fbfaff;
   border-radius: 14px;
@@ -3274,6 +3275,7 @@ select:focus {
   flex-direction: column;
   justify-content: center;
   gap: 6px;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -3348,8 +3350,11 @@ select:focus {
 }
 
 .product-price {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
   color: var(--primary);
-  font-size: 1.58rem;
+  font-size: 1.12rem;
   line-height: 1;
 }
 
