@@ -209,7 +209,13 @@ async function handleStatic(request, response) {
   response.end(body);
 }
 
-function assetContentType(filePath) {
+function assetContentType(filePath, body) {
+  if (body.subarray(0, 4).toString("ascii") === "RIFF" && body.subarray(8, 12).toString("ascii") === "WEBP") {
+    return "image/webp";
+  }
+  if (body.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
+    return "image/png";
+  }
   const extension = path.extname(filePath).toLowerCase();
   if (extension === ".png") return "image/png";
   if (extension === ".jpg" || extension === ".jpeg") return "image/jpeg";
@@ -232,7 +238,7 @@ async function handleAsset(pathname, response) {
   try {
     const body = await readFile(assetPath);
     response.writeHead(200, {
-      "Content-Type": assetContentType(assetPath),
+      "Content-Type": assetContentType(assetPath, body),
       "Cache-Control": "no-store",
     });
     response.end(body);

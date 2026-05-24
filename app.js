@@ -270,8 +270,18 @@ function closeIcon() {
 }
 
 function productImageMarkup(product) {
-  if (!product.image) return "";
-  return `<img src="${escapeAttribute(product.image)}" alt="" loading="lazy" onerror="this.closest('.product-thumb')?.classList.add('image-missing'); this.remove();" />`;
+  const image = product.image || defaultProductImage(product.name);
+  return `<img src="${escapeAttribute(image)}" alt="" loading="lazy" onerror="this.closest('.product-thumb')?.classList.add('image-missing'); this.remove();" />`;
+}
+
+function defaultProductImage(name) {
+  const slug = String(name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug ? `/assets/products/${slug}.png` : "";
 }
 
 function productFallbackIcon(category) {
