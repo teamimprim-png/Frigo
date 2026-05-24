@@ -14,8 +14,10 @@ Puis ouvrir une des pages:
 
 - `http://localhost:4173/kiosque`
 - `http://localhost:4173/gestion`
+- `http://localhost:4173/inventaire`
 
-Les deux pages ne sont pas reliees dans l'interface: elles s'ouvrent directement par URL.
+Les pages ne sont pas reliees dans l'interface: elles s'ouvrent directement par URL.
+Sur le reseau local, utilisez l'adresse du Mac, par exemple `http://macbook-air.local:4173/inventaire`.
 
 Le port peut etre change avec la variable `PORT`.
 
@@ -34,7 +36,7 @@ npm run dev -- 4181
 - `Kiosque`: selection d'un equipier, ajout des produits consommes, paiement en especes ou mise en credit.
 - `Rembourser un credit`: saisie d'un remboursement, qui diminue le credit de l'equipier et augmente la caisse theorique.
 - `Gestion`: ajout/modification des produits, equipiers, stock en rayon, reserve et remplissage.
-- `Inventaire`: saisie du stock compte, de l'argent compte et du total de la feuille de credit pour calculer les ecarts.
+- `Inventaire`: saisie du stock compte et de la caisse frigo pour calculer les ecarts.
 - `Exporter` / `Importer`: sauvegarde ou restauration des donnees au format JSON.
 - `Synchronisation`: le badge dans l'en-tete indique si les donnees sont bien sauvegardees par le serveur Node.js.
 

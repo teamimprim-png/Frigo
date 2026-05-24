@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header class="app-header">
@@ -15,45 +15,77 @@
         <h1>Frigo Equipe</h1>
         <p>Boissons, friandises, surgelés et crédits</p>
       </div>
-      <div class="kiosk-sidebar-filter" aria-label="Catégories équipiers">
-        <span>Catégories</span>
-        <div id="member-group-buttons" class="category-button-group" role="group" aria-label="Filtrer par catégorie"></div>
-      </div>
       <div class="kiosk-sidebar-add">
-        <button id="toggle-kiosk-member-form" class="secondary-button kiosk-add-toggle" type="button" aria-expanded="false">
-          <i data-lucide="user-plus"></i>
-          Ajouter un équipier
+        <button id="open-credit-account" class="secondary-button kiosk-credit-button" type="button">
+          <i data-lucide="coins"></i>
+          Créditer
         </button>
-        <form id="kiosk-member-form" class="kiosk-member-form hidden" aria-label="Ajouter un équipier">
-          <input name="name" required placeholder="Nouvel équipier" autocomplete="off" />
-          <select name="group"></select>
-          <button class="secondary-button" type="submit">
-            <i data-lucide="user-plus"></i>
-            Ajouter
-          </button>
-        </form>
+        <button id="open-cash-withdrawal" class="secondary-button kiosk-cash-withdraw-button" type="button">
+          <i data-lucide="wallet"></i>
+          Retrait caisse
+        </button>
       </div>
     </header>
 
     <main>
       <section id="kiosk" class="view active-view" aria-labelledby="kiosk-title">
-        
-
         <div class="kiosk-layout">
-          <aside class="panel">
-            <h3><i data-lucide="users"></i> Équipier</h3>
-            <div class="member-tools">
-              <div class="alphabet-filter">
-                <button id="toggle-member-letter-filter" class="secondary-button alphabet-toggle" type="button" aria-expanded="false">
-                  <i data-lucide="list-filter"></i>
-                  Alphabet
-                </button>
-                <div id="member-letter-buttons" class="letter-button-group hidden" role="group" aria-label="Filtrer par initiale"></div>
-              </div>
+          <section class="panel product-panel">
+            <div class="tabs" role="tablist" aria-label="Catégories">
+              <button class="active" data-category="all">Tout</button>
+              <button data-category="drink">Boissons</button>
+              <button data-category="snack">Friandises</button>
+              <button data-category="frozen">Surgelés</button>
             </div>
-            <div id="member-picker" class="member-grid"></div>
-          </aside>
+            <div id="kiosk-products" class="product-grid"></div>
+          </section>
 
+          <aside class="panel cart-panel">
+            <h3><i data-lucide="shopping-cart"></i> Panier</h3>
+            <div id="cart-items" class="cart-items empty"></div>
+            <div class="cart-total">
+              <span>Total</span>
+              <strong id="cart-total">0,00 EUR</strong>
+            </div>
+
+            <div class="checkout-actions">
+              <button id="cash-checkout" class="primary-button">
+                <i data-lucide="banknote"></i>
+                Espèces
+              </button>
+              <button id="credit-checkout" class="primary-button accent">
+                <i data-lucide="credit-card"></i>
+                Crédit
+              </button>
+              <button id="clear-cart" class="secondary-button">
+                <i data-lucide="trash-2"></i>
+                Vider le panier
+              </button>
+            </div>
+          </aside>
+        </div>
+
+        <div id="kiosk-credit-members" class="kiosk-credit-overlay hidden">
+          <div class="kiosk-credit-header">
+            <button id="kiosk-back-to-products" class="secondary-button" type="button">
+              <i data-lucide="arrow-left"></i>
+              Retour
+            </button>
+            <h3>Choisir un équipier</h3>
+          </div>
+          <div class="kiosk-credit-filters">
+            <div id="credit-member-group-buttons" class="category-button-group" role="group" aria-label="Filtrer par catégorie"></div>
+            <div id="credit-member-letter-buttons" class="letter-button-group" role="group" aria-label="Filtrer par initiale"></div>
+          </div>
+          <form id="kiosk-credit-member-form" class="kiosk-credit-member-form" aria-label="Ajouter un équipier">
+            <input name="name" required placeholder="Prénom de l'équipier" autocomplete="off" />
+            <select name="group"></select>
+            <button class="primary-button" type="submit">
+              <i data-lucide="user-plus"></i>
+              Ajouter
+            </button>
+          </form>
+          <div id="credit-member-list" class="member-grid"></div>
         </div>
       </section>
 
@@ -65,27 +97,27 @@
           </div>
         </div>
 
+        <div class="management-banner">
+          <div class="stats-grid" id="stats"></div>
+        </div>
+
         <div class="management-shell">
           <aside class="management-sidebar" aria-label="Navigation gestion">
-            <button class="active" data-management-section="overview">
-              <i data-lucide="gauge"></i>
-              Aperçu
-            </button>
-            <button data-management-section="members">
-              <i data-lucide="users"></i>
-              Équipiers
-            </button>
-            <button data-management-section="products">
-              <i data-lucide="package"></i>
-              Stock
+            <button class="active" data-management-section="inventory">
+              <i data-lucide="clipboard-list"></i>
+              Inventaire
             </button>
             <button data-management-section="restock">
               <i data-lucide="truck"></i>
               Remplissage
             </button>
-            <button data-management-section="inventory">
-              <i data-lucide="clipboard-list"></i>
-              Inventaire
+            <button data-management-section="products">
+              <i data-lucide="package"></i>
+              Stock
+            </button>
+            <button data-management-section="members">
+              <i data-lucide="users"></i>
+              Équipiers
             </button>
             <button data-management-section="history">
               <i data-lucide="history"></i>
@@ -105,10 +137,6 @@
           </aside>
 
           <div class="management-content">
-            <section class="management-section active-management-section" data-section-panel="overview">
-              <div class="stats-grid" id="stats"></div>
-            </section>
-
             <section class="panel management-section" data-section-panel="products">
               <div class="panel-heading-actions">
                 <h3><i data-lucide="package"></i> Stock</h3>
@@ -138,16 +166,18 @@
             <div id="restock-list" class="restock-table"></div>
           </section>
 
-          <section class="panel management-section" data-section-panel="inventory">
+          <section class="panel management-section active-management-section" data-section-panel="inventory">
             <h3><i data-lucide="clipboard-list"></i> Inventaire</h3>
             <form id="inventory-form" class="inventory-form">
               <div id="inventory-products"></div>
-              <label>Argent compté<input name="cashCounted" type="number" min="0" step="0.01" value="0" /></label>
-              <label>Total feuille de crédit<input name="creditSheetTotal" type="number" min="0" step="0.01" value="0" /></label>
-              <button class="primary-button" type="submit">
-                <i data-lucide="check-circle"></i>
-                Clôturer l'inventaire
-              </button>
+              <div class="inventory-close-row">
+                <label>Caisse frigo<input name="cashCounted" type="text" value="0" inputmode="decimal" /></label>
+                <label>Montant remis<input name="cashRetained" type="text" value="0" inputmode="decimal" /></label>
+                <button class="primary-button" type="submit">
+                  <i data-lucide="check-circle"></i>
+                  Clôturer
+                </button>
+              </div>
             </form>
             <div id="inventory-summary" class="summary-box"></div>
           </section>
@@ -175,14 +205,14 @@
             <div id="inv-mobile-products"></div>
 
             <section class="inv-mobile-cash">
-              <h3><i data-lucide="banknote"></i> Caisse & Crédits</h3>
+              <h3><i data-lucide="banknote"></i> Caisse</h3>
               <label>
-                <span>Argent compté</span>
-                <input name="cashCounted" type="number" min="0" step="0.01" value="0" inputmode="decimal" />
+                <span>Caisse frigo</span>
+                <input name="cashCounted" type="text" value="0" inputmode="decimal" enterkeyhint="next" />
               </label>
               <label>
-                <span>Total feuille de crédit</span>
-                <input name="creditSheetTotal" type="number" min="0" step="0.01" value="0" inputmode="decimal" />
+                <span>Montant remis</span>
+                <input name="cashRetained" type="text" value="0" inputmode="decimal" enterkeyhint="done" />
               </label>
             </section>
 
@@ -193,6 +223,14 @@
               Clôturer l'inventaire
             </button>
           </form>
+
+          <section id="inv-mobile-restock" class="inv-mobile-restock hidden">
+            <h3><i data-lucide="truck"></i> Produits à remettre dans le frigo</h3>
+            <div id="inv-mobile-restock-list"></div>
+            <button id="inv-mobile-restock-done" class="secondary-button" type="button">
+              <i data-lucide="check"></i> Terminé
+            </button>
+          </section>
         </div>
       </section>
     </main>
@@ -210,10 +248,6 @@
         </div>
 
         <div class="member-action-grid">
-          <button id="member-start-purchase" class="primary-button" type="button">
-            <i data-lucide="shopping-cart"></i>
-            Achat
-          </button>
           <button id="member-credit-account" class="secondary-button" type="button">
             <i data-lucide="coins"></i>
             Créditer compte
@@ -233,9 +267,55 @@
           </button>
         </form>
 
-        <menu>
-        </menu>
       </div>
+    </dialog>
+
+    <dialog id="cash-dialog">
+      <form class="dialog-form" method="dialog">
+        <button id="cash-dialog-close" class="icon-button dialog-close-button" type="button" aria-label="Fermer">
+          <i data-lucide="x"></i>
+        </button>
+        <h3>Paiement espèces</h3>
+        <div class="cash-dialog-total">
+          <span>Total à payer</span>
+          <strong id="cash-dialog-total">0,00 €</strong>
+        </div>
+        <div class="cash-preset-grid" aria-label="Montants reçus rapides">
+          <button type="button" class="secondary-button" data-cash-preset="1">1 €</button>
+          <button type="button" class="secondary-button" data-cash-preset="1.5">1,50 €</button>
+          <button type="button" class="secondary-button" data-cash-preset="2">2 €</button>
+          <button type="button" class="secondary-button" data-cash-preset="5">5 €</button>
+        </div>
+        <label>Montant reçu<input id="cash-received" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+        <div class="change-result">
+          <span>Monnaie à rendre</span>
+          <strong id="cash-change">0,00 €</strong>
+        </div>
+        <button id="confirm-cash-checkout" class="primary-button" type="submit">
+          <i data-lucide="check"></i>
+          Valider espèces
+        </button>
+      </form>
+    </dialog>
+
+    <dialog id="cash-withdrawal-dialog">
+      <form id="cash-withdrawal-form" class="dialog-form cash-withdrawal-form">
+        <button id="cash-withdrawal-close" class="icon-button dialog-close-button" type="button" aria-label="Fermer">
+          <i data-lucide="x"></i>
+        </button>
+        <h3>Retrait caisse</h3>
+        <div class="form-grid">
+          <label>Équipier maintenance<select name="memberId" required></select></label>
+          <label>Somme retirée<input name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" required /></label>
+        </div>
+        <menu>
+          <button class="secondary-button" type="button" id="cancel-cash-withdrawal">Annuler</button>
+          <button class="primary-button" type="submit">
+            <i data-lucide="check"></i>
+            Enregistrer
+          </button>
+        </menu>
+      </form>
     </dialog>
 
     <dialog id="product-dialog">
@@ -258,8 +338,8 @@
               <option value="freezer">Congélateur</option>
             </select>
           </label>
-          <label>Dans le frigo<input name="displayStock" type="number" min="0" step="1" required /></label>
           <label>Réserve<input name="reserveStock" type="number" min="0" step="1" required /></label>
+          <label>Cible remplissage<input name="restockTarget" type="number" min="0" step="1" value="10" /></label>
         </div>
         <menu>
           <button class="secondary-button" type="button" id="cancel-product-edit">Annuler</button>
@@ -289,57 +369,10 @@
       </form>
     </dialog>
 
-    <dialog id="purchase-dialog" class="purchase-dialog">
-      <div class="purchase-dialog-shell">
-        <section class="panel product-panel">
-          <div id="purchase-context" class="purchase-context"></div>
-          <div class="tabs" role="tablist" aria-label="Catégories">
-            <button class="active" data-category="all">Tout</button>
-            <button data-category="drink">Boissons</button>
-            <button data-category="snack">Friandises</button>
-            <button data-category="frozen">Surgelés</button>
-          </div>
-          <div id="kiosk-products" class="product-grid"></div>
-        </section>
 
-        <aside class="panel cart-panel">
-          <h3><i data-lucide="shopping-cart"></i> Panier</h3>
-          <div id="cart-items" class="cart-items empty">Aucun produit sélectionné</div>
-          <div class="cart-total">
-            <span>Total</span>
-            <strong id="cart-total">0,00 EUR</strong>
-          </div>
-          <div id="cash-change-panel" class="cash-change-panel hidden">
-            <label>Montant reçu<input id="cash-received" type="number" min="0" step="0.01" inputmode="decimal" /></label>
-            <div class="change-result">
-              <span>Monnaie à rendre</span>
-              <strong id="cash-change">0,00 €</strong>
-            </div>
-            <button id="confirm-cash-checkout" class="primary-button" type="button">
-              <i data-lucide="check"></i>
-              Valider espèces
-            </button>
-          </div>
-          <div class="checkout-actions">
-            <button id="cash-checkout" class="primary-button">
-              <i data-lucide="banknote"></i>
-              Espèces
-            </button>
-            <button id="credit-checkout" class="primary-button accent">
-              <i data-lucide="credit-card"></i>
-              Crédit
-            </button>
-            <button id="clear-cart" class="secondary-button">
-              <i data-lucide="trash-2"></i>
-              Vider le panier
-            </button>
-          </div>
-        </aside>
-      </div>
-    </dialog>
 
     <div id="toast" role="status" aria-live="polite"></div>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="app.js"></script>
+    <script src="/app.js"></script>
   </body>
 </html>

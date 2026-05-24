@@ -204,19 +204,26 @@ main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
   gap: 20px;
-  align-items: start;
-}
-
-.kiosk-layout > .panel:first-child {
-  grid-column: 1 / -1;
 }
 
 .kiosk-layout > .product-panel {
   grid-column: 1;
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
 }
 
 .kiosk-layout > .cart-panel {
   grid-column: 2;
+  max-height: calc(100vh - 56px);
+  top: 0;
+}
+
+.management-banner {
+  margin-bottom: 20px;
+}
+
+.management-banner .stats-grid {
+  margin-bottom: 0;
 }
 
 .management-shell {
@@ -800,38 +807,7 @@ main {
 
 /* Restock styles moved down below .table-row to maintain correct CSS specificity order */
 
-.purchase-context {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 18px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.03);
-}
 
-.purchase-context div {
-  display: grid;
-  gap: 2px;
-}
-
-.purchase-context strong {
-  font-size: 1.05rem;
-}
-
-.purchase-context small {
-  color: var(--text-muted);
-}
-
-.context-label {
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
 
 /* Category Tabs */
 .tabs {
@@ -842,6 +818,13 @@ main {
   border-radius: 10px;
   border: 1px solid var(--border);
   margin-bottom: 20px;
+}
+
+.product-panel > .tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg-panel);
 }
 
 .tabs button {
@@ -1178,30 +1161,18 @@ main {
   color: var(--primary);
 }
 
-.cash-change-panel {
+.cash-preset-grid {
   display: grid;
-  gap: 12px;
-  margin-top: 12px;
-  padding: 14px;
-  border: 1px solid rgba(16, 185, 129, 0.24);
-  border-radius: var(--radius-md);
-  background: rgba(16, 185, 129, 0.08);
-}
-
-.cash-change-panel label {
-  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
-.cash-change-panel input {
-  min-height: 48px;
-  font-size: 1.25rem;
-  font-weight: 800;
+.cash-preset-grid button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  font-size: 0.92rem;
+  font-weight: 900;
 }
 
 .change-result {
@@ -1221,6 +1192,30 @@ main {
 
 .change-result strong {
   font-size: 1.35rem;
+  color: var(--primary);
+}
+
+#cash-dialog {
+  width: min(380px, calc(100vw - 32px));
+}
+
+.cash-dialog-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.cash-dialog-total span {
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.cash-dialog-total strong {
+  font-size: 1.6rem;
+  font-weight: 900;
   color: var(--primary);
 }
 
@@ -1466,6 +1461,29 @@ button:active {
   grid-template-columns: 1fr;
 }
 
+.inventory-close-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  max-width: 560px;
+}
+
+.inventory-close-row label {
+  flex: 1 1 170px;
+  margin: 0;
+}
+
+.inventory-close-row input {
+  height: 36px;
+}
+
+.inventory-close-row .primary-button {
+  flex: 0 0 auto;
+  height: 36px;
+  padding: 0 12px;
+}
+
 .inline-form {
   display: flex;
   gap: 10px;
@@ -1587,15 +1605,26 @@ select:focus {
 .restock-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: start;
   gap: 8px;
   width: 100%;
   min-height: 92px;
+  padding: 12px;
 }
 
 .restock-row.needs-restock {
   border-color: rgba(229, 72, 93, 0.26);
   background: rgba(229, 72, 93, 0.03);
+}
+
+.restock-row .row-meta {
+  flex-wrap: wrap;
+  white-space: normal;
+  gap: 4px 12px;
+}
+
+.restock-row .row-meta span {
+  white-space: nowrap;
 }
 
 .restock-transfer-field {
@@ -1768,7 +1797,7 @@ select:focus {
   opacity: 0.7;
 }
 
-.reserve-inline-field {
+.stock-inline-field {
   display: inline-flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -1784,7 +1813,7 @@ select:focus {
   grid-column: 1 / -1;
 }
 
-.reserve-inline-field i {
+.stock-inline-field i {
   display: block;
   flex: 0 0 auto;
   width: 16px;
@@ -1792,12 +1821,12 @@ select:focus {
   color: var(--text-muted);
 }
 
-.reserve-inline-field span {
+.stock-inline-field span {
   flex: 0 0 auto;
   color: var(--text-muted);
 }
 
-.reserve-edit-input {
+.stock-edit-input {
   flex: 0 0 54px;
   width: 54px;
   height: 30px;
@@ -1807,8 +1836,86 @@ select:focus {
   font-weight: 800;
 }
 
-body[data-page="management"] .reserve-edit-input {
+body[data-page="management"] .stock-edit-input {
   height: 30px;
+}
+
+.stock-single {
+  grid-column: 1 / -1;
+}
+
+.stock-single input {
+  background: var(--rose-glow);
+  border-color: rgba(244, 63, 94, 0.24);
+  color: var(--rose-light);
+}
+
+.stock-single input:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-glow);
+}
+
+.stock-single i {
+  color: var(--rose-light) !important;
+}
+
+.manage-stock-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.manage-stock-fields > .stock-inline-field {
+  grid-column: auto;
+}
+
+.restock-target-field {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.restock-target-field i {
+  width: 14px;
+  height: 14px;
+  color: var(--amber);
+}
+
+.target-edit-input {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  background: var(--amber-glow);
+  border-color: rgba(245, 158, 11, 0.24);
+  color: var(--amber-light);
+}
+
+.target-edit-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-glow);
+}
+
+.row-meta .success {
+  color: var(--primary);
+}
+
+.row-meta .success i {
+  color: var(--primary);
+  opacity: 1;
 }
 
 .row-actions {
@@ -2023,35 +2130,187 @@ dialog[open]::backdrop {
   width: min(520px, calc(100vw - 32px));
 }
 
-#purchase-dialog {
-  width: min(1320px, calc(100vw - 28px));
-  max-height: calc(100vh - 28px);
-  overflow: hidden;
+.kiosk-credit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: var(--bg-panel-solid);
 }
 
-.purchase-dialog-shell {
+.kiosk-credit-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.kiosk-credit-header h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+.kiosk-credit-header button {
+  min-height: 48px;
+  min-width: 100px;
+  font-size: 1rem;
+}
+
+.kiosk-credit-header button i {
+  width: 22px;
+  height: 22px;
+}
+
+.kiosk-credit-filters {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 18px;
-  padding: 18px;
-  max-height: calc(100vh - 28px);
-  overflow: hidden;
+  gap: 10px;
+  flex-shrink: 0;
+  margin: 12px 0;
 }
 
-.purchase-dialog .panel {
-  box-shadow: none;
+.kiosk-credit-filters .category-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.purchase-dialog .product-panel {
+.kiosk-credit-filters .category-button-group button {
+  flex: 1 1 auto;
+  min-height: 48px;
+  min-width: 80px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  border-radius: 12px;
+}
+
+.kiosk-credit-filters .letter-button-group {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 6px;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kiosk-credit-filters .letter-button-group button {
+  flex: 0 0 auto;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 12px;
+  font-size: 0.9rem;
+  border-radius: 10px;
+}
+
+.kiosk-credit-overlay .member-grid {
+  flex: 1;
+  max-height: none;
   min-height: 0;
-  max-height: calc(100vh - 64px);
   overflow-y: auto;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding-right: 4px;
 }
 
-.purchase-dialog .cart-panel {
-  position: sticky;
-  top: 0;
-  max-height: calc(100vh - 64px);
+.kiosk-credit-overlay .member-card {
+  min-height: 0;
+  height: auto;
+  padding: 8px 12px;
+  gap: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.kiosk-credit-overlay .member-card:hover {
+  border-color: var(--indigo);
+  background: rgba(47, 104, 232, 0.04);
+}
+
+.kiosk-credit-overlay .member-card:active {
+  transform: scale(0.98);
+}
+
+.kiosk-credit-overlay .member-card .member-details {
+  gap: 1px;
+}
+
+.kiosk-credit-overlay .member-card .member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kiosk-credit-overlay .member-card .member-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.kiosk-credit-overlay .member-card .member-balance {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.kiosk-credit-overlay .member-card .member-group-text {
+  font-size: 0.68rem;
+}
+
+.kiosk-credit-button {
+  min-height: 38px;
+  opacity: 0.72;
+  font-size: 0.84rem;
+}
+
+.kiosk-credit-button:hover {
+  opacity: 1;
+}
+
+.kiosk-credit-overlay .member-card-actions button {
+  min-height: 48px;
+  font-size: 0.95rem;
+  border-radius: 12px;
+}
+
+.kiosk-credit-overlay .member-card-actions button i {
+  width: 20px;
+  height: 20px;
+}
+
+.kiosk-credit-member-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.kiosk-credit-member-form input,
+.kiosk-credit-member-form select {
+  flex: 1;
+  min-height: 52px;
+  font-size: 1rem;
+  border-radius: 12px;
+}
+
+.kiosk-credit-member-form button {
+  flex: 0 0 auto;
+  min-height: 52px;
+  min-width: 120px;
+  font-size: 1rem;
+  border-radius: 12px;
+}
+
+.kiosk-credit-member-form button i {
+  width: 20px;
+  height: 20px;
 }
 
 .member-dialog-header {
@@ -2233,6 +2492,7 @@ dialog[open]::backdrop {
 .history-icon-payment { background: var(--primary-glow); color: var(--primary); }
 .history-icon-cash { background: var(--primary-glow); color: var(--primary); }
 .history-icon-credit { background: var(--purple-glow); color: var(--purple-light); }
+.history-icon-withdrawal { background: rgba(245, 158, 11, 0.14); color: var(--amber-light); }
 
 .history-item-body {
   flex-grow: 1;
@@ -2300,6 +2560,7 @@ dialog[open]::backdrop {
 .history-item-badge.badge-payment { color: var(--primary); }
 .history-item-badge.badge-cash { color: var(--primary); }
 .history-item-badge.badge-credit { color: var(--purple-light); }
+.history-item-badge.badge-withdrawal { color: var(--amber-light); }
 
 .history-item-sub {
   display: flex;
@@ -2340,7 +2601,7 @@ dialog[open]::backdrop {
 .warning { color: var(--amber) !important; }
 
 /* Responsive adjustments */
-@media (max-width: 1200px) {
+@media (max-width: 680px) {
   .kiosk-layout {
     grid-template-columns: 1fr;
   }
@@ -2348,6 +2609,10 @@ dialog[open]::backdrop {
   .kiosk-layout > .product-panel,
   .kiosk-layout > .cart-panel {
     grid-column: 1;
+  }
+
+  .kiosk-layout > .product-panel {
+    max-height: none;
   }
   
   .cart-panel {
@@ -2359,15 +2624,6 @@ dialog[open]::backdrop {
     max-height: 300px;
   }
 
-  .purchase-dialog-shell {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-
-  .purchase-dialog .product-panel,
-  .purchase-dialog .cart-panel {
-    max-height: none;
-  }
 }
 
 @media (max-width: 900px) {
@@ -2519,6 +2775,7 @@ body::before {
   border-right: 1px solid var(--border);
   border-bottom: 0;
   box-shadow: none;
+  overflow-y: auto;
 }
 
 .app-header > div:first-child {
@@ -2574,7 +2831,10 @@ body::before {
 
 body[data-page="kiosk"] .kiosk-sidebar-filter {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  flex: 1 1 auto;
   gap: 10px;
+  min-height: 0;
   margin-top: 4px;
 }
 
@@ -2589,6 +2849,9 @@ body[data-page="kiosk"] .kiosk-sidebar-filter > span {
 body[data-page="kiosk"] .kiosk-sidebar-filter .category-button-group {
   display: grid;
   gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 body[data-page="kiosk"] .kiosk-sidebar-filter .category-button-group button {
@@ -2611,8 +2874,9 @@ body[data-page="kiosk"] .kiosk-sidebar-filter .category-button-group button.acti
 
 body[data-page="kiosk"] .kiosk-sidebar-add {
   display: grid;
+  flex: 0 0 auto;
   gap: 10px;
-  margin-top: auto;
+  margin-top: 0;
 }
 
 body[data-page="kiosk"] .kiosk-sidebar-add .kiosk-member-form {
@@ -2626,6 +2890,16 @@ body[data-page="kiosk"] .kiosk-sidebar-add .kiosk-member-form input,
 body[data-page="kiosk"] .kiosk-sidebar-add .kiosk-member-form select,
 body[data-page="kiosk"] .kiosk-sidebar-add .kiosk-member-form button {
   width: 100%;
+}
+
+.kiosk-cash-withdraw-button {
+  min-height: 38px;
+  opacity: 0.72;
+  font-size: 0.84rem;
+}
+
+.kiosk-cash-withdraw-button:hover {
+  opacity: 1;
 }
 
 body[data-page="management"] .kiosk-sidebar-filter,
@@ -2767,7 +3041,6 @@ body[data-page="management"] .view {
 .table-row,
 .history-item-body,
 .cart-total,
-.purchase-context,
 .cash-change-panel,
 .summary-box,
 .empty-list-placeholder,
@@ -2866,58 +3139,24 @@ select:focus {
   color: var(--text);
 }
 
-#purchase-dialog {
-  width: 100vw;
-  max-width: none;
-  height: 100vh;
-  max-height: none;
-  border: 0;
-  border-radius: 0;
-  background: #fff;
-  overflow: hidden;
+.kiosk-credit-overlay .kiosk-credit-header button {
+  background: #f6f7fd;
+  border-color: var(--border);
+  color: var(--text);
 }
 
-#purchase-dialog[open] {
-  transform: translate(-50%, -50%) scale(1);
+.kiosk-credit-overlay .kiosk-credit-header button:hover {
+  background: #edf2ff;
+  border-color: rgba(47, 104, 232, 0.28);
+  color: var(--indigo);
 }
 
-.purchase-dialog-shell {
-  grid-template-columns: minmax(0, 1fr) 370px;
-  gap: 0;
-  padding: 0;
-  height: 100vh;
-  max-height: none;
-  background: #fff;
+.kiosk-credit-member-form {
+  background: #f8f9ff;
+  border-color: var(--border);
 }
 
-.purchase-dialog .product-panel,
-.purchase-dialog .cart-panel {
-  max-height: 100vh;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
 
-.purchase-dialog .product-panel {
-  padding: 26px;
-  background: #fff;
-  overflow-y: auto;
-}
-
-.purchase-dialog .cart-panel {
-  top: 0;
-  padding: 28px;
-  background: #faf9ff;
-  border-left: 1px solid var(--border);
-}
-
-.purchase-context {
-  min-height: 62px;
-  margin-bottom: 18px;
-  background: #fff;
-  border: 0;
-  box-shadow: none;
-}
 
 .tabs {
   gap: 16px;
@@ -3296,8 +3535,8 @@ dialog::backdrop {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px;
+  border-radius: 8px;
+  padding: 10px;
   box-shadow: var(--shadow-md);
 }
 
@@ -3310,8 +3549,8 @@ dialog::backdrop {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
-  margin-bottom: 14px;
-  padding-bottom: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -3323,20 +3562,30 @@ dialog::backdrop {
 
 .inv-mobile-cash label {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
   color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 600;
 }
 
+.inv-mobile-cash label:last-child {
+  margin-bottom: 0;
+}
+
+.inv-mobile-cash label span {
+  flex: 0 0 auto;
+}
+
 .inv-mobile-cash input {
-  width: 100%;
-  height: 48px;
-  font-size: 1.15rem;
+  width: 140px;
+  height: 38px;
+  font-size: 1rem;
   font-weight: 700;
-  padding: 0 14px;
+  padding: 0 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: rgba(0, 0, 0, 0.2);
@@ -3376,9 +3625,112 @@ dialog::backdrop {
 
 .inv-submit-btn {
   width: 100%;
-  height: 52px;
+  height: 42px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+}
+
+.inv-mobile-restock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inv-mobile-restock h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.1rem;
-  border-radius: var(--radius-md);
+  font-weight: 800;
+  color: var(--amber-light);
+}
+
+.inv-mobile-restock h3 i {
+  width: 20px;
+  height: 20px;
+}
+
+.inv-mobile-restock #inv-mobile-restock-done {
+  align-self: center;
+  min-width: 160px;
+}
+
+.restock-after-inv-row {
+  border-color: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.restock-after-inv-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.restock-after-inv-missing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--rose-glow);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  flex-shrink: 0;
+}
+
+.restock-after-inv-missing span {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rose-light);
+  opacity: 0.85;
+}
+
+.restock-after-inv-missing strong {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--rose-light);
+  line-height: 1;
+}
+
+.restock-after-inv-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+
+.restock-after-inv-controls input {
+  width: 56px;
+  height: 40px;
+  padding: 0 6px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  -moz-appearance: textfield;
+}
+
+.restock-after-inv-controls input::-webkit-outer-spin-button,
+.restock-after-inv-controls input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.restock-after-inv-controls input:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px var(--indigo-glow);
 }
 
 @media (max-width: 1100px) {
@@ -3434,13 +3786,4 @@ dialog::backdrop {
     box-shadow: var(--shadow-md);
   }
 
-  .purchase-dialog-shell {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-
-  .purchase-dialog .cart-panel {
-    border-left: 0;
-    border-top: 1px solid var(--border);
-  }
 }

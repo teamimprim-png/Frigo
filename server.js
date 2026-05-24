@@ -1,12 +1,14 @@
 const http = require("node:http");
 const { randomUUID } = require("node:crypto");
 const { mkdir, readFile, writeFile } = require("node:fs/promises");
+const os = require("node:os");
 const path = require("node:path");
 
 const sseClients = new Set();
 
 const requestedPort = Number(process.argv[2] || process.env.PORT);
 const PORT = Number.isInteger(requestedPort) && requestedPort > 0 ? requestedPort : 4173;
+const HOST = process.env.HOST || "0.0.0.0";
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "frigo-state.json");
@@ -26,8 +28,8 @@ const demoState = {
     { id: randomUUID(), name: "Coca", price: 1.2, category: "drink", location: "fridge", displayStock: 12, reserveStock: 24 },
     { id: randomUUID(), name: "Eau petillante", price: 0.8, category: "drink", location: "fridge", displayStock: 10, reserveStock: 18 },
     { id: randomUUID(), name: "Barre chocolat", price: 1, category: "snack", location: "fridge", displayStock: 15, reserveStock: 20 },
-    { id: randomUUID(), name: "Pizza", price: 3.5, category: "frozen", location: "freezer", displayStock: 6, reserveStock: 12 },
-    { id: randomUUID(), name: "Glace", price: 1.5, category: "frozen", location: "freezer", displayStock: 8, reserveStock: 16 },
+    { id: randomUUID(), name: "Pizza", price: 3.5, category: "frozen", location: "freezer", displayStock: 6, reserveStock: 6 },
+    { id: randomUUID(), name: "Glace", price: 1.5, category: "frozen", location: "freezer", displayStock: 8, reserveStock: 8 },
   ],
   members: [
     { id: randomUUID(), name: "Alex", group: "chauffeur", balance: 0 },
@@ -36,6 +38,7 @@ const demoState = {
   ],
   transactions: [],
   inventories: [],
+  inventoryDraft: { products: {}, cashCounted: "" },
   lastInventoryAt: null,
 };
 
@@ -57,18 +60,25 @@ function normalizeState(nextState) {
     members: Array.isArray(nextState?.members) ? nextState.members : [],
     transactions: Array.isArray(nextState?.transactions) ? nextState.transactions : [],
     inventories: Array.isArray(nextState?.inventories) ? nextState.inventories : [],
+    inventoryDraft: normalizeInventoryDraft(nextState?.inventoryDraft),
     lastInventoryAt: nextState?.lastInventoryAt ?? null,
   };
 
-  state.products = state.products.map((product) => ({
-    id: product.id || randomUUID(),
-    name: String(product.name || "Produit").trim(),
-    price: Number(product.price) || 0,
-    category: ["drink", "snack", "frozen"].includes(product.category) ? product.category : "drink",
-    location: ["fridge", "freezer"].includes(product.location) ? product.location : "fridge",
-    displayStock: Math.max(0, Number(product.displayStock) || 0),
-    reserveStock: Math.max(0, Number(product.reserveStock) || 0),
-  }));
+  state.products = state.products.map((product) => {
+    const displayStock = Math.max(0, Number(product.displayStock) || 0);
+    const reserveStock = Math.max(0, Number(product.reserveStock) || 0);
+    return {
+      id: product.id || randomUUID(),
+      name: String(product.name || "Produit").trim(),
+      price: Number(product.price) || 0,
+      category: ["drink", "snack", "frozen"].includes(product.category) ? product.category : "drink",
+      location: ["fridge", "freezer"].includes(product.location) ? product.location : "fridge",
+      displayStock,
+      reserveStock: product.category === "frozen" ? displayStock : reserveStock,
+      inventoryBaseStock: Math.max(0, Number(product.inventoryBaseStock ?? displayStock) || 0),
+      restockTarget: Math.max(0, Number(product.restockTarget) || 10),
+    };
+  });
 
   state.members = state.members.map((member) => ({
     id: member.id || randomUUID(),
@@ -78,6 +88,13 @@ function normalizeState(nextState) {
   }));
 
   return state;
+}
+
+function normalizeInventoryDraft(draft = {}) {
+  return {
+    products: draft.products && typeof draft.products === "object" ? draft.products : {},
+    cashCounted: draft.cashCounted ?? "",
+  };
 }
 
 async function readState() {
@@ -167,12 +184,15 @@ async function handleApi(request, response) {
 
 async function handleStatic(request, response) {
   const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
-  const target = staticFiles.get(pathname);
+  const target = staticFiles.get(pathname) || { file: "index.html", type: "text/html; charset=utf-8" };
 
-  if (!target) {
-    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    response.end("Fichier introuvable");
-    return;
+  if (pathname.includes(".")) {
+    const knownAsset = staticFiles.get(pathname);
+    if (!knownAsset) {
+      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      response.end("Fichier introuvable");
+      return;
+    }
   }
 
   const body = await readFile(path.join(ROOT, target.file));
@@ -206,6 +226,14 @@ server.on("error", (error) => {
   process.exit(1);
 });
 
-server.listen(PORT, () => {
+function getLanAddresses() {
+  return Object.values(os.networkInterfaces())
+    .flat()
+    .filter((network) => network && network.family === "IPv4" && !network.internal)
+    .map((network) => `http://${network.address}:${PORT}`);
+}
+
+server.listen(PORT, HOST, () => {
   console.log(`Frigo Equipe prêt sur http://localhost:${PORT}`);
+  getLanAddresses().forEach((address) => console.log(`Réseau local: ${address}`));
 });
