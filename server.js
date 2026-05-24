@@ -12,6 +12,7 @@ const HOST = process.env.HOST || "0.0.0.0";
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "frigo-state.json");
+const ASSETS_DIR = path.join(ROOT, "assets");
 
 const memberGroups = {
   chauffeur: "Chauffeur",
@@ -71,6 +72,7 @@ function normalizeState(nextState) {
       id: product.id || randomUUID(),
       name: String(product.name || "Produit").trim(),
       price: Number(product.price) || 0,
+      image: String(product.image || "").trim(),
       category: ["drink", "snack", "frozen"].includes(product.category) ? product.category : "drink",
       location: ["fridge", "freezer"].includes(product.location) ? product.location : "fridge",
       displayStock,
@@ -184,6 +186,10 @@ async function handleApi(request, response) {
 
 async function handleStatic(request, response) {
   const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
+  if (pathname.startsWith("/assets/")) {
+    await handleAsset(pathname, response);
+    return;
+  }
   const target = staticFiles.get(pathname) || { file: "index.html", type: "text/html; charset=utf-8" };
 
   if (pathname.includes(".")) {
@@ -201,6 +207,39 @@ async function handleStatic(request, response) {
     "Cache-Control": "no-store",
   });
   response.end(body);
+}
+
+function assetContentType(filePath) {
+  const extension = path.extname(filePath).toLowerCase();
+  if (extension === ".png") return "image/png";
+  if (extension === ".jpg" || extension === ".jpeg") return "image/jpeg";
+  if (extension === ".webp") return "image/webp";
+  if (extension === ".gif") return "image/gif";
+  if (extension === ".svg") return "image/svg+xml";
+  return "application/octet-stream";
+}
+
+async function handleAsset(pathname, response) {
+  const relativePath = decodeURIComponent(pathname.replace(/^\/assets\//, ""));
+  const assetPath = path.resolve(ASSETS_DIR, relativePath);
+
+  if (!assetPath.startsWith(`${ASSETS_DIR}${path.sep}`)) {
+    response.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Acces refuse");
+    return;
+  }
+
+  try {
+    const body = await readFile(assetPath);
+    response.writeHead(200, {
+      "Content-Type": assetContentType(assetPath),
+      "Cache-Control": "no-store",
+    });
+    response.end(body);
+  } catch {
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Fichier introuvable");
+  }
 }
 
 const server = http.createServer(async (request, response) => {

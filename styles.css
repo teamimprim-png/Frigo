@@ -950,7 +950,66 @@ main {
 }
 
 .product-card-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 16px;
+  min-width: 0;
+}
+
+.product-card-text {
+  min-width: 0;
+}
+
+.product-thumb {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eef4ff;
+  color: var(--indigo);
+}
+
+.product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-thumb i,
+.product-thumb svg {
+  width: 20px;
+  height: 20px;
+}
+
+.product-thumb img + i,
+.product-thumb img + svg {
+  display: none;
+}
+
+.product-thumb.category-snack {
+  background: #fff8e8;
+  color: var(--amber);
+}
+
+.product-thumb.category-frozen {
+  background: #eafaff;
+  color: #15a7c8;
+}
+
+.product-manage-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.product-manage-thumb i,
+.product-manage-thumb svg {
+  width: 16px;
+  height: 16px;
 }
 
 .product-card-body strong {
@@ -3204,6 +3263,68 @@ select:focus {
 
 .product-card-header {
   margin-bottom: 10px;
+}
+
+.product-card-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.product-card-text {
+  min-width: 0;
+}
+
+.product-thumb {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eef4ff;
+  color: var(--indigo);
+}
+
+.product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-thumb i,
+.product-thumb svg {
+  width: 20px;
+  height: 20px;
+}
+
+.product-thumb img + i,
+.product-thumb img + svg {
+  display: none;
+}
+
+.product-thumb.category-snack {
+  background: #fff8e8;
+  color: var(--amber);
+}
+
+.product-thumb.category-frozen {
+  background: #eafaff;
+  color: #15a7c8;
+}
+
+.product-manage-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.product-manage-thumb i,
+.product-manage-thumb svg {
+  width: 16px;
+  height: 16px;
 }
 
 .product-badge {

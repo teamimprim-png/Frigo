@@ -133,6 +133,7 @@ function normalizeState(nextState) {
     const displayStock = Math.max(0, Number(product.displayStock) || 0);
     const base = {
       ...product,
+      image: String(product.image || "").trim(),
       displayStock,
       reserveStock: Math.max(0, Number(product.reserveStock) || 0),
       inventoryBaseStock: Math.max(0, Number(product.inventoryBaseStock ?? displayStock) || 0),
@@ -266,6 +267,15 @@ function closeIcon() {
       <path d="m6 6 12 12"></path>
     </svg>
   `;
+}
+
+function productImageMarkup(product) {
+  if (!product.image) return "";
+  return `<img src="${escapeAttribute(product.image)}" alt="" loading="lazy" onerror="this.closest('.product-thumb')?.classList.add('image-missing'); this.remove();" />`;
+}
+
+function productFallbackIcon(category) {
+  return `<i data-lucide="${category === "drink" ? "cup-soda" : category === "snack" ? "cookie" : "snowflake"}"></i>`;
 }
 
 function escapeAttribute(value) {
@@ -592,10 +602,16 @@ function renderKioskProducts() {
         </span>
       </div>
       <div class="product-card-body">
-        <strong>${product.name}</strong>
-        <div class="product-location">
-          <i data-lucide="${locationIcons[product.location]}"></i>
-          <span>${locations[product.location]}</span>
+        <span class="product-thumb category-${product.category}">
+          ${productImageMarkup(product)}
+          ${productFallbackIcon(product.category)}
+        </span>
+        <div class="product-card-text">
+          <strong>${product.name}</strong>
+          <div class="product-location">
+            <i data-lucide="${locationIcons[product.location]}"></i>
+            <span>${locations[product.location]}</span>
+          </div>
         </div>
       </div>
       <div class="product-card-footer">
@@ -862,8 +878,14 @@ function renderProductManagement() {
       row.className = "table-row product-manage-row";
       row.innerHTML = `
       <div class="product-name-cell">
-        <strong>${product.name}</strong>
-        <span class="pill-category category-${product.category}">${categories[product.category]}</span>
+        <span class="product-thumb product-manage-thumb category-${product.category}">
+          ${productImageMarkup(product)}
+          ${productFallbackIcon(product.category)}
+        </span>
+        <div>
+          <strong>${product.name}</strong>
+          <span class="pill-category category-${product.category}">${categories[product.category]}</span>
+        </div>
       </div>
       <div class="manage-stock-fields">
         ${product.category === "frozen"
@@ -1536,6 +1558,7 @@ function submitProduct(event) {
     existing.price = Number(data.price);
     existing.category = data.category;
     existing.location = data.location;
+    existing.image = String(data.image || "").trim();
     existing.reserveStock = Number(data.category === "frozen" ? existing.displayStock : data.reserveStock);
     existing.restockTarget = Math.max(0, Number(data.restockTarget) || 10);
   } else {
@@ -1546,6 +1569,7 @@ function submitProduct(event) {
       price: Number(data.price),
       category: data.category,
       location: data.location,
+      image: String(data.image || "").trim(),
       displayStock,
       reserveStock: Number(data.category === "frozen" ? displayStock : data.reserveStock),
       restockTarget: Math.max(0, Number(data.restockTarget) || 10),
