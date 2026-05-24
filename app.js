@@ -226,6 +226,48 @@ function formatDate(value) {
   return dateFormatter.format(new Date(value));
 }
 
+function cartProductIcon(category) {
+  if (category === "drink") {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 3h12l-1.2 17.1A1 1 0 0 1 15.8 21H8.2a1 1 0 0 1-1-.9L6 3Z"></path>
+        <path d="M8 7h8"></path>
+        <path d="M10 3V1.8h5"></path>
+      </svg>
+    `;
+  }
+  if (category === "snack") {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="m7.5 7.5 9 9"></path>
+        <path d="M8.5 3.5 3.5 8.5l3 3 5-5-3-3Z"></path>
+        <path d="m15.5 20.5 5-5-3-3-5 5 3 3Z"></path>
+        <path d="M9 12 12 9"></path>
+        <path d="m12 15 3-3"></path>
+      </svg>
+    `;
+  }
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 2v20"></path>
+      <path d="m4.9 4.9 14.2 14.2"></path>
+      <path d="M2 12h20"></path>
+      <path d="M4.9 19.1 19.1 4.9"></path>
+      <path d="m8 5 4 4 4-4"></path>
+      <path d="m8 19 4-4 4 4"></path>
+    </svg>
+  `;
+}
+
+function closeIcon() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M18 6 6 18"></path>
+      <path d="m6 6 12 12"></path>
+    </svg>
+  `;
+}
+
 function escapeAttribute(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -609,7 +651,7 @@ function renderCart() {
       line.className = "cart-line";
       line.innerHTML = `
         <span class="cart-product-thumb category-${product.category}">
-          <i data-lucide="${product.category === "drink" ? "cup-soda" : product.category === "snack" ? "candy" : "snowflake"}"></i>
+          ${cartProductIcon(product.category)}
         </span>
         <div class="cart-item-info">
           <strong class="cart-item-name">${product.name}</strong>
@@ -621,7 +663,7 @@ function renderCart() {
         <div class="cart-item-actions">
           <span class="cart-item-subtotal">${formatMoney(product.price * item.quantity)}</span>
           <button class="icon-button remove-btn" aria-label="Retirer ${product.name}">
-            <i data-lucide="minus"></i>
+            ${closeIcon()}
           </button>
         </div>
       `;

@@ -1126,9 +1126,16 @@ main {
   transition: var(--transition);
 }
 
-.icon-button i {
+.icon-button i,
+.icon-button svg {
   width: 14px;
   height: 14px;
+  color: currentColor;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .icon-button:hover {
@@ -3286,9 +3293,22 @@ select:focus {
   color: var(--indigo);
 }
 
-.cart-product-thumb i {
+.cart-product-thumb i,
+.cart-product-thumb svg {
   width: 20px;
   height: 20px;
+  color: currentColor;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.remove-btn {
+  background: #fff5f7;
+  border-color: rgba(229, 72, 93, 0.24);
+  color: var(--rose);
 }
 
 .cart-product-thumb.category-snack {
