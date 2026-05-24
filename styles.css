@@ -3284,8 +3284,8 @@ select:focus {
   width: 78px;
   height: 78px;
   overflow: hidden;
-  border-radius: 12px;
-  background: #eef4ff;
+  border-radius: 0;
+  background: transparent;
   color: var(--indigo);
 }
 
@@ -3293,6 +3293,7 @@ select:focus {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 0;
 }
 
 .product-thumb i,
@@ -3307,12 +3308,10 @@ select:focus {
 }
 
 .product-thumb.category-snack {
-  background: #fff8e8;
   color: var(--amber);
 }
 
 .product-thumb.category-frozen {
-  background: #eafaff;
   color: #15a7c8;
 }
 
