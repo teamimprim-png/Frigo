@@ -271,17 +271,32 @@ function closeIcon() {
 
 function productImageMarkup(product) {
   const image = product.image || defaultProductImage(product.name);
-  return `<img src="${escapeAttribute(image)}" alt="" loading="lazy" onerror="this.closest('.product-thumb')?.classList.add('image-missing'); this.remove();" />`;
+  const fallbackImage = product.image ? "" : fallbackProductImage(product.name);
+  const onError = fallbackImage
+    ? `this.onerror=function(){this.closest('.product-thumb')?.classList.add('image-missing'); this.remove();}; this.src='${escapeAttribute(fallbackImage)}';`
+    : "this.closest('.product-thumb')?.classList.add('image-missing'); this.remove();";
+  return `<img src="${escapeAttribute(image)}" alt="" loading="lazy" onerror="${onError}" />`;
+}
+
+function normalizedProductName(name) {
+  return String(name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 }
 
 function defaultProductImage(name) {
-  const slug = String(name || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
+  const slug = normalizedProductName(name)
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
   return slug ? `/assets/products/${slug}.png` : "";
+}
+
+function fallbackProductImage(name) {
+  const filename = normalizedProductName(name)
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+  return filename ? `/assets/products/${filename}.png` : "";
 }
 
 function productFallbackIcon(category) {

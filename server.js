@@ -216,12 +216,16 @@ function assetContentType(filePath, body) {
   if (body.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
     return "image/png";
   }
+  if (body.subarray(4, 12).toString("ascii") === "ftypavif") {
+    return "image/avif";
+  }
   const extension = path.extname(filePath).toLowerCase();
   if (extension === ".png") return "image/png";
   if (extension === ".jpg" || extension === ".jpeg") return "image/jpeg";
   if (extension === ".webp") return "image/webp";
   if (extension === ".gif") return "image/gif";
   if (extension === ".svg") return "image/svg+xml";
+  if (extension === ".avif") return "image/avif";
   return "application/octet-stream";
 }
 
