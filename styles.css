@@ -3247,8 +3247,9 @@ select:focus {
 
 .product-card {
   position: relative;
-  min-height: 104px;
-  padding: 12px 12px 30px;
+  height: 132px;
+  min-height: 132px;
+  padding: 12px 12px 30px 116px;
   border-color: var(--border);
   background: #fbfaff;
   border-radius: 14px;
@@ -3264,10 +3265,11 @@ select:focus {
 
 .product-card-body {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: stretch;
+  gap: 0;
   min-width: 0;
   height: 100%;
+  min-height: 0;
 }
 
 .product-card-text {
@@ -3280,12 +3282,13 @@ select:focus {
 }
 
 .product-thumb {
+  position: absolute;
+  inset: 0 auto 0 0;
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
-  width: 96px;
-  height: 96px;
-  aspect-ratio: 1;
+  width: 104px;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
   border-radius: 0;
   background: transparent;
