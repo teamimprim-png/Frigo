@@ -3283,8 +3283,8 @@ select:focus {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 82px;
-  height: 82px;
+  width: 96px;
+  height: 96px;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 0;
