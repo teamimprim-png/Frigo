@@ -3249,7 +3249,7 @@ select:focus {
   position: relative;
   height: 132px;
   min-height: 132px;
-  padding: 12px 12px 30px 116px;
+  padding: 12px 12px 30px 120px;
   border-color: var(--border);
   background: #fbfaff;
   border-radius: 14px;
@@ -3283,11 +3283,11 @@ select:focus {
 
 .product-thumb {
   position: absolute;
-  inset: 0 auto 0 0;
+  inset: 6px auto 6px 6px;
   display: grid;
   place-items: center;
   width: 104px;
-  height: 100%;
+  height: auto;
   min-height: 0;
   overflow: hidden;
   border-radius: 0;
