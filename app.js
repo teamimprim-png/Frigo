@@ -570,11 +570,6 @@ function renderKioskProducts() {
     snack: "cookie",
     frozen: "snowflake",
   };
-  const visualIcons = {
-    drink: "cup-soda",
-    snack: "candy",
-    frozen: "snowflake",
-  };
   const locationIcons = {
     fridge: "thermometer",
     freezer: "snowflake",
@@ -587,9 +582,6 @@ function renderKioskProducts() {
     button.dataset.location = product.location;
     button.disabled = product.displayStock <= 0;
     button.innerHTML = `
-      <div class="product-visual category-${product.category}">
-        <i data-lucide="${visualIcons[product.category]}"></i>
-      </div>
       <div class="product-card-header">
         <span class="product-badge category-${product.category}">
           <i data-lucide="${categoryIcons[product.category]}"></i>

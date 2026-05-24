@@ -3182,13 +3182,13 @@ select:focus {
 }
 
 .product-grid {
-  grid-template-columns: repeat(auto-fill, minmax(162px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+  gap: 14px;
 }
 
 .product-card {
-  min-height: 250px;
-  padding: 18px;
+  min-height: 128px;
+  padding: 14px;
   border-color: var(--border);
   background: #fbfaff;
   border-radius: 14px;
@@ -3200,36 +3200,6 @@ select:focus {
   background: #fff;
   border-color: rgba(47, 104, 232, 0.34);
   box-shadow: 0 20px 42px rgba(22, 34, 61, 0.10);
-}
-
-.product-visual {
-  height: 126px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 14px;
-  border-radius: 10px;
-  background: #f0f2fb;
-}
-
-.product-visual i {
-  width: 62px;
-  height: 62px;
-  stroke-width: 1.8;
-}
-
-.product-visual.category-drink {
-  color: var(--indigo);
-  background: #eef4ff;
-}
-
-.product-visual.category-snack {
-  color: var(--amber);
-  background: #fff8e8;
-}
-
-.product-visual.category-frozen {
-  color: #15a7c8;
-  background: #eafaff;
 }
 
 .product-card-header {
