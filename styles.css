@@ -3218,7 +3218,8 @@ select:focus {
 }
 
 .product-card-body strong {
-  font-size: 0.92rem;
+  font-size: 1.12rem;
+  line-height: 1.2;
 }
 
 .product-location {
@@ -3227,7 +3228,7 @@ select:focus {
 
 .product-price {
   color: var(--primary);
-  font-size: 1.38rem;
+  font-size: 1.48rem;
 }
 
 .add-indicator {
