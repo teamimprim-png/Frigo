@@ -585,16 +585,6 @@ function renderKioskProducts() {
     return;
   }
 
-  const categoryIcons = {
-    drink: "cup-soda",
-    snack: "cookie",
-    frozen: "snowflake",
-  };
-  const locationIcons = {
-    fridge: "thermometer",
-    freezer: "snowflake",
-  };
-
   products.forEach((product) => {
     const button = document.createElement("button");
     button.className = "product-card";
@@ -602,15 +592,6 @@ function renderKioskProducts() {
     button.dataset.location = product.location;
     button.disabled = product.displayStock <= 0;
     button.innerHTML = `
-      <div class="product-card-header">
-        <span class="product-badge category-${product.category}">
-          <i data-lucide="${categoryIcons[product.category]}"></i>
-          <span>${categories[product.category]}</span>
-        </span>
-        <span class="stock-badge ${product.displayStock <= 2 ? 'low-stock' : ''}">
-          ${product.displayStock} dispo
-        </span>
-      </div>
       <div class="product-card-body">
         <span class="product-thumb category-${product.category}">
           ${productImageMarkup(product)}
@@ -618,15 +599,8 @@ function renderKioskProducts() {
         </span>
         <div class="product-card-text">
           <strong>${product.name}</strong>
-          <div class="product-location">
-            <i data-lucide="${locationIcons[product.location]}"></i>
-            <span>${locations[product.location]}</span>
-          </div>
+          <span class="product-price">${formatMoney(product.price)}</span>
         </div>
-      </div>
-      <div class="product-card-footer">
-        <span class="product-price">${formatMoney(product.price)}</span>
-        <span class="add-indicator"><i data-lucide="plus"></i></span>
       </div>
     `;
     button.addEventListener("click", () => addToCart(product.id));
