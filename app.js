@@ -2387,6 +2387,7 @@ function bindEvents() {
   function goToRestock() {
     saveState();
     if (activePage() === "management") {
+      $("#inventory-go-restock").closest(".panel-heading-actions").classList.add("hidden");
       $("#inventory-form").classList.add("hidden");
       $("#inventory-summary").classList.add("hidden");
       $("#inventory-restock").classList.remove("hidden");
@@ -2401,6 +2402,7 @@ function bindEvents() {
   $("#inventory-mobile-go-restock").addEventListener("click", goToRestock);
 
   $("#inventory-restock-done").addEventListener("click", () => {
+    $("#inventory-go-restock").closest(".panel-heading-actions").classList.remove("hidden");
     $("#inventory-restock").classList.add("hidden");
     $("#inventory-form").classList.remove("hidden");
     $("#inventory-summary").classList.remove("hidden");
