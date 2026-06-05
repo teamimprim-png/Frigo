@@ -172,11 +172,12 @@
 
           <section class="panel management-section active-management-section" data-section-panel="inventory">
             <div class="panel-heading-actions">
-              <h3><i data-lucide="clipboard-list"></i> Inventaire</h3>
-              <button id="inventory-go-restock" class="secondary-button" type="button">
-                <i data-lucide="truck"></i>
-                Remplissage
-              </button>
+              <h3>
+                <button id="inventory-go-restock" class="icon-button" type="button" aria-label="Remplissage">
+                  <i data-lucide="arrow-left"></i>
+                </button>
+                <i data-lucide="clipboard-list"></i> Inventaire
+              </h3>
             </div>
             <form id="inventory-form" class="inventory-form">
               <div id="inventory-products"></div>
@@ -211,14 +212,13 @@
       <section id="inventaire" class="view">
         <div class="inv-mobile">
           <header class="inv-mobile-header">
+            <button id="inventory-mobile-go-restock" class="icon-button" type="button" aria-label="Remplissage" style="flex-shrink:0">
+              <i data-lucide="arrow-left"></i>
+            </button>
             <div>
               <h2>Inventaire</h2>
               <p>Comptez les produits dans le frigo et le congélateur</p>
             </div>
-            <button id="inventory-mobile-go-restock" class="secondary-button inv-top-restock" type="button">
-              <i data-lucide="truck"></i>
-              Remplissage
-            </button>
           </header>
 
           <form id="inventory-mobile-form" class="inv-mobile-form">

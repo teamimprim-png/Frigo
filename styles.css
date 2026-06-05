@@ -360,6 +360,18 @@ main {
   height: 18px;
 }
 
+.panel h3 .icon-button {
+  width: 30px;
+  height: 30px;
+  margin-right: 2px;
+}
+
+.panel h3 .icon-button i {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
 .panel-heading-actions {
   display: flex;
   align-items: center;
@@ -3618,10 +3630,6 @@ dialog::backdrop {
 .inv-mobile-header .back-button i {
   width: 20px;
   height: 20px;
-}
-
-.inv-mobile-header .inv-top-restock {
-  margin-left: auto;
 }
 
 .inv-mobile-form {
