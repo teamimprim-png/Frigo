@@ -2382,12 +2382,16 @@ function bindEvents() {
   $$("#inventory-mobile-form .inv-mobile-cash input").forEach((input) => {
     input.addEventListener("keydown", handleInventoryMobileKeyboard);
   });
-  $("#inventory-go-restock").addEventListener("click", () => {
-    $$("[data-management-section]").find((btn) => btn.dataset.managementSection === "restock")?.click();
-  });
-  $("#inventory-mobile-go-restock").addEventListener("click", () => {
-    $$("[data-management-section]").find((btn) => btn.dataset.managementSection === "restock")?.click();
-  });
+  function goToRestock() {
+    saveState();
+    if (activePage() !== "management") {
+      history.pushState(null, "", "/gestion");
+      applyActivePage();
+    }
+    document.querySelector('[data-management-section="restock"]')?.click();
+  }
+  $("#inventory-go-restock").addEventListener("click", goToRestock);
+  $("#inventory-mobile-go-restock").addEventListener("click", goToRestock);
   $("#inv-mobile-restock-done").addEventListener("click", () => {
     $("#inv-mobile-restock").classList.add("hidden");
     $("#inventory-mobile-form").classList.remove("hidden");
