@@ -171,7 +171,13 @@
           </section>
 
           <section class="panel management-section active-management-section" data-section-panel="inventory">
-            <h3><i data-lucide="clipboard-list"></i> Inventaire</h3>
+            <div class="panel-heading-actions">
+              <h3><i data-lucide="clipboard-list"></i> Inventaire</h3>
+              <button id="inventory-go-restock" class="secondary-button" type="button">
+                <i data-lucide="truck"></i>
+                Remplissage
+              </button>
+            </div>
             <form id="inventory-form" class="inventory-form">
               <div id="inventory-products"></div>
               <div class="inventory-close-row">
@@ -180,10 +186,6 @@
                 <button class="primary-button" type="submit">
                   <i data-lucide="check-circle"></i>
                   Clôturer
-                </button>
-                <button id="inventory-go-restock" class="secondary-button" type="button">
-                  <i data-lucide="truck"></i>
-                  Remplissage
                 </button>
               </div>
             </form>
@@ -207,6 +209,10 @@
               <h2>Inventaire</h2>
               <p>Comptez les produits dans le frigo et le congélateur</p>
             </div>
+            <button id="inventory-mobile-go-restock" class="secondary-button inv-top-restock" type="button">
+              <i data-lucide="truck"></i>
+              Remplissage
+            </button>
           </header>
 
           <form id="inventory-mobile-form" class="inv-mobile-form">
@@ -231,10 +237,6 @@
               Clôturer l'inventaire
             </button>
 
-            <button id="inventory-mobile-go-restock" class="secondary-button inv-submit-btn" type="button" style="margin-top:8px">
-              <i data-lucide="truck"></i>
-              Aller au remplissage
-            </button>
           </form>
 
           <section id="inv-mobile-restock" class="inv-mobile-restock hidden">

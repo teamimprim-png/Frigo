@@ -3620,6 +3620,10 @@ dialog::backdrop {
   height: 20px;
 }
 
+.inv-mobile-header .inv-top-restock {
+  margin-left: auto;
+}
+
 .inv-mobile-form {
   display: flex;
   flex-direction: column;
