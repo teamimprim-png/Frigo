@@ -1458,7 +1458,7 @@ function renderInventory() {
       items.append(row);
     });
 
-    productFields.append(column);
+    listContainer.append(section);
   });
 
   updateInventorySummary();
@@ -2144,7 +2144,7 @@ function renderMobileRestockAfterInventory(listContainer, sectionContainer) {
       items.append(row);
     });
 
-    container.append(section);
+    listContainer.append(section);
   });
 
   if (window.lucide) window.lucide.createIcons();
