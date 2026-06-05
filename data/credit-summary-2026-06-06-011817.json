@@ -1,0 +1,999 @@
+{
+  "exportedAt": "2026-06-05T23:18:17.801Z",
+  "period": {
+    "from": "2026-06-05T23:18:17.757Z",
+    "to": "2026-06-05T23:18:17.801Z"
+  },
+  "members": [
+    {
+      "name": "Abbab",
+      "group": "Chauffeur",
+      "balance": 3,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Abdel chauffeur",
+      "group": "Chauffeur",
+      "balance": 14.6,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Adam Rahmou",
+      "group": "Autre",
+      "balance": -0.5,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Aït Taleb",
+      "group": "Autre",
+      "balance": 3.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Akram Mejri",
+      "group": "Roto",
+      "balance": 18.5,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Alexandro",
+      "group": "Roto",
+      "balance": 21,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Alou Chauffeur",
+      "group": "Chauffeur",
+      "balance": -0.8,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Ambre",
+      "group": "Départ",
+      "balance": 1.1,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Andri",
+      "group": "Chauffeur",
+      "balance": -0.2,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Anis",
+      "group": "Maintenance",
+      "balance": -5,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Anthony Perma Roto",
+      "group": "Roto",
+      "balance": -2.3,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Anya Départ",
+      "group": "Départ",
+      "balance": 1.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Assan Chauffeur",
+      "group": "Chauffeur",
+      "balance": 0,
+      "status": "neutre",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Aurelien Carle",
+      "group": "Autre",
+      "balance": 0,
+      "status": "neutre",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Bogdan",
+      "group": "Chauffeur",
+      "balance": -0.5,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Bonabot",
+      "group": "Maintenance",
+      "balance": 6.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Boucheny",
+      "group": "Roto",
+      "balance": 1.5,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Boucher Greg",
+      "group": "Roto",
+      "balance": 12.6,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Bran",
+      "group": "Maintenance",
+      "balance": 2.7,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Buagiar Christophe",
+      "group": "Cadre",
+      "balance": 14.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Bubu",
+      "group": "Départ",
+      "balance": 9.8,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Coralie",
+      "group": "Départ",
+      "balance": 11.3,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Delacroix",
+      "group": "Maintenance",
+      "balance": 3.7,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Delcroix Arnaud",
+      "group": "Roto",
+      "balance": 6.7,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Devred Fred",
+      "group": "Roto",
+      "balance": 1.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Dimier",
+      "group": "Départ",
+      "balance": 6,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Djaoui",
+      "group": "Autre",
+      "balance": -3.2,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Dorard Alexis",
+      "group": "Roto",
+      "balance": -4.4,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Erwan Départ",
+      "group": "Départ",
+      "balance": 6.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Esmaeil Perma",
+      "group": "Départ",
+      "balance": -8.6,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Fabrice Lhermitte",
+      "group": "Départ",
+      "balance": -14.3,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Fethi",
+      "group": "Chauffeur",
+      "balance": 40.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Gaelle Départ",
+      "group": "Départ",
+      "balance": 3,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Gaucher Cyril",
+      "group": "Roto",
+      "balance": 6.1,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Gengen",
+      "group": "Maintenance",
+      "balance": -1.8,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Geron",
+      "group": "Roto",
+      "balance": 0.8,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Gros Pouces",
+      "group": "Roto",
+      "balance": 1,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Groslip",
+      "group": "Départ",
+      "balance": -5.8,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Halim Chauffeur",
+      "group": "Chauffeur",
+      "balance": 0.6,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Hamza Chauffeur",
+      "group": "Chauffeur",
+      "balance": 0,
+      "status": "neutre",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Ilyes",
+      "group": "Départ",
+      "balance": 0,
+      "status": "neutre",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Ingrid",
+      "group": "Départ",
+      "balance": 1.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Jamel Chauffeur",
+      "group": "Chauffeur",
+      "balance": 1,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Jeremie",
+      "group": "Roto",
+      "balance": 4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Jouhert",
+      "group": "Cadre",
+      "balance": 4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Juju",
+      "group": "Maintenance",
+      "balance": 5,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Julian IPCS",
+      "group": "Chauffeur",
+      "balance": -2.2,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Julien Vidal",
+      "group": "Départ",
+      "balance": 22.6,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Kamel Chauffeur",
+      "group": "Chauffeur",
+      "balance": -2.3,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Kayembe",
+      "group": "Maintenance",
+      "balance": 20.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Kevin",
+      "group": "Autre",
+      "balance": -28.4,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Kylian",
+      "group": "Autre",
+      "balance": 15.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Lachaud",
+      "group": "Roto",
+      "balance": -18.1,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Langlois",
+      "group": "Roto",
+      "balance": 5,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Lecoeur",
+      "group": "Maintenance",
+      "balance": 18.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Limonta Michel",
+      "group": "Roto",
+      "balance": -1.3,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Lionnel roto",
+      "group": "Roto",
+      "balance": 9.7,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Lounes",
+      "group": "Départ",
+      "balance": 3.6,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Lucas Denis",
+      "group": "Autre",
+      "balance": 0,
+      "status": "neutre",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Ludo",
+      "group": "Cadre",
+      "balance": 5.3,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Manu Départ",
+      "group": "Départ",
+      "balance": -1,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Margot J.",
+      "group": "Départ",
+      "balance": 6,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Marie Denis",
+      "group": "Départ",
+      "balance": -0.1,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Mario",
+      "group": "Maintenance",
+      "balance": 6.9,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Mathéo",
+      "group": "Départ",
+      "balance": 0.7,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Maurice",
+      "group": "Maintenance",
+      "balance": -0.8,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Mélissa Leri",
+      "group": "Départ",
+      "balance": 1.9,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Mickael Roto",
+      "group": "Roto",
+      "balance": -1.6,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Nabil",
+      "group": "Autre",
+      "balance": -6.2,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Nico Lourdez",
+      "group": "Départ",
+      "balance": 4.9,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Nico Troiano",
+      "group": "Photograveur",
+      "balance": -7.1,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Océane",
+      "group": "Départ",
+      "balance": -3.7,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Oldann",
+      "group": "Maintenance",
+      "balance": 3.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Olivier Départ",
+      "group": "Départ",
+      "balance": 0.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Omid Départ",
+      "group": "Départ",
+      "balance": -3.8,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Guillaume Petit",
+      "group": "Roto",
+      "balance": -3.8,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Pierre Chaulliac",
+      "group": "Maintenance",
+      "balance": -1.6,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Pinto",
+      "group": "Maintenance",
+      "balance": 0.8999999999999999,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Ragi Bruno",
+      "group": "Départ",
+      "balance": -0.3,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Ragi Loic",
+      "group": "Départ",
+      "balance": 12.1,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Rayane G.",
+      "group": "Départ",
+      "balance": -5,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Raymond",
+      "group": "Autre",
+      "balance": -0.4,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Rico Départ",
+      "group": "Départ",
+      "balance": 4.1,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Riles",
+      "group": "Départ",
+      "balance": 1,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Robache",
+      "group": "Maintenance",
+      "balance": 19.5,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Rubio Anthony",
+      "group": "Maintenance",
+      "balance": 5,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Rudy",
+      "group": "Roto",
+      "balance": 7.9,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Salim",
+      "group": "Maintenance",
+      "balance": -2.6,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Sandra",
+      "group": "Départ",
+      "balance": -0.5,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Sandra Nuit",
+      "group": "Départ",
+      "balance": -6.9,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Sarah",
+      "group": "Départ",
+      "balance": -19.3,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Sébastien Chauffeur",
+      "group": "Chauffeur",
+      "balance": -2.2,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Selim Roto",
+      "group": "Roto",
+      "balance": 0.3,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Sofiane",
+      "group": "Cadre",
+      "balance": 2.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Steph Auvergnat",
+      "group": "Photograveur",
+      "balance": -1.1,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Stephane T.",
+      "group": "Maintenance",
+      "balance": 3,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Steph. Roto",
+      "group": "Roto",
+      "balance": 1.9,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Teti",
+      "group": "Maintenance",
+      "balance": -21.5,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Théo Roto",
+      "group": "Roto",
+      "balance": 2.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Titouan",
+      "group": "Départ",
+      "balance": 2.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Victoria",
+      "group": "Départ",
+      "balance": 4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Vinatier",
+      "group": "Maintenance",
+      "balance": 8.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Virgilia",
+      "group": "Départ",
+      "balance": -1.5,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Will Derson Chauffeur",
+      "group": "Chauffeur",
+      "balance": 7.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Yacine Ackba",
+      "group": "Départ",
+      "balance": 20.4,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Yazid Saoura",
+      "group": "Départ",
+      "balance": 0,
+      "status": "neutre",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Younes Départ",
+      "group": "Départ",
+      "balance": 2.2,
+      "status": "doit",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Yves",
+      "group": "Roto",
+      "balance": -7.4,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Laura Duchossois",
+      "group": "Départ",
+      "balance": 0,
+      "status": "neutre",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    },
+    {
+      "name": "Abdel perma",
+      "group": "Départ",
+      "balance": -1,
+      "status": "avoir",
+      "periodPurchases": 0,
+      "periodPayments": 0,
+      "periodChange": 0
+    }
+  ]
+}

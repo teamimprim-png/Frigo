@@ -2082,15 +2082,17 @@ function submitInventoryMobile(event) {
   }
 }
 
-function renderMobileRestockAfterInventory() {
-  const container = $("#inv-mobile-restock-list");
-  container.innerHTML = "";
+function renderMobileRestockAfterInventory(listContainer, sectionContainer) {
+  listContainer = listContainer || $("#inv-mobile-restock-list");
+  sectionContainer = sectionContainer || $("#inv-mobile-restock");
+  listContainer.innerHTML = "";
 
   const toRestock = state.products.filter((p) => p.restockTarget > p.displayStock);
 
   if (!toRestock.length) {
-    $("#inv-mobile-restock").classList.add("hidden");
-    $("#inventory-mobile-form").classList.remove("hidden");
+    listContainer.innerHTML = '<p class="empty-placeholder">Tous les produits sont à la cible.</p>';
+    sectionContainer.classList.remove("hidden");
+    if (window.lucide) window.lucide.createIcons();
     return;
   }
 
@@ -2384,14 +2386,25 @@ function bindEvents() {
   });
   function goToRestock() {
     saveState();
-    if (activePage() !== "management") {
-      history.pushState(null, "", "/gestion");
-      applyActivePage();
+    if (activePage() === "management") {
+      $("#inventory-form").classList.add("hidden");
+      $("#inventory-summary").classList.add("hidden");
+      $("#inventory-restock").classList.remove("hidden");
+      renderMobileRestockAfterInventory($("#inventory-restock-list"), $("#inventory-restock"));
+    } else {
+      $("#inventory-mobile-form").classList.add("hidden");
+      $("#inv-mobile-restock").classList.remove("hidden");
+      renderMobileRestockAfterInventory($("#inv-mobile-restock-list"), $("#inv-mobile-restock"));
     }
-    document.querySelector('[data-management-section="restock"]')?.click();
   }
   $("#inventory-go-restock").addEventListener("click", goToRestock);
   $("#inventory-mobile-go-restock").addEventListener("click", goToRestock);
+
+  $("#inventory-restock-done").addEventListener("click", () => {
+    $("#inventory-restock").classList.add("hidden");
+    $("#inventory-form").classList.remove("hidden");
+    $("#inventory-summary").classList.remove("hidden");
+  });
   $("#inv-mobile-restock-done").addEventListener("click", () => {
     $("#inv-mobile-restock").classList.add("hidden");
     $("#inventory-mobile-form").classList.remove("hidden");
