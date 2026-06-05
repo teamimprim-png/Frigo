@@ -1458,7 +1458,7 @@ function renderInventory() {
       items.append(row);
     });
 
-    listContainer.append(section);
+    productFields.append(column);
   });
 
   updateInventorySummary();
