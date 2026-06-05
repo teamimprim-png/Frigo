@@ -158,6 +158,27 @@ async function handleApi(request, response) {
     return;
   }
 
+  if (request.url === "/api/export/credit-summary" && request.method === "POST") {
+    try {
+      const body = await readRequestBody(request);
+      const data = JSON.parse(body);
+      const now = new Date();
+      const ts = now.getFullYear()
+        + "-" + String(now.getMonth() + 1).padStart(2, "0")
+        + "-" + String(now.getDate()).padStart(2, "0")
+        + "-" + String(now.getHours()).padStart(2, "0")
+        + String(now.getMinutes()).padStart(2, "0")
+        + String(now.getSeconds()).padStart(2, "0");
+      const filePath = path.join(DATA_DIR, `credit-summary-${ts}.json`);
+      await mkdir(DATA_DIR, { recursive: true });
+      await writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+      sendJson(response, 200, { ok: true, file: `credit-summary-${ts}.json` });
+    } catch {
+      sendJson(response, 400, { error: "Données invalides" });
+    }
+    return;
+  }
+
   if (request.url !== "/api/state") {
     sendJson(response, 404, { error: "Route inconnue" });
     return;

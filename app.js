@@ -6,6 +6,14 @@ let syncPaused = false;
 let pendingSync = false;
 let saveTimer = null;
 
+function cloneDeep(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+if (!("structuredClone" in globalThis)) {
+  globalThis.structuredClone = cloneDeep;
+}
+
 function createId() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
   if (globalThis.crypto?.getRandomValues) {
@@ -87,10 +95,22 @@ const moneyFormatter = new Intl.NumberFormat("fr-FR", {
   currency: "EUR",
 });
 
-const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
-  dateStyle: "short",
-  timeStyle: "short",
-});
+let dateFormatter;
+try {
+  dateFormatter = new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeStyle: "short" });
+} catch {
+  dateFormatter = {
+    format: (date) => {
+      const d = new Date(date);
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yy = String(d.getFullYear()).slice(2);
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mi = String(d.getMinutes()).padStart(2, "0");
+      return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+    },
+  };
+}
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -349,6 +369,12 @@ function currentPeriodCashWithdrawals() {
     .reduce((sum, transaction) => sum + transaction.amount, 0);
 }
 
+function currentPeriodCreditSalesValue() {
+  return currentPeriodTransactions()
+    .filter((transaction) => transaction.type === "sale" && transaction.payment === "credit")
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+}
+
 function totalCredit() {
   return state.members.reduce((sum, member) => sum + Math.max(0, member.balance), 0);
 }
@@ -506,18 +532,22 @@ function renderCreditMembers() {
 
   visibleMembers.forEach((member) => {
     const card = document.createElement("article");
-    card.className = "member-card";
+    card.className = "member-card member-manage-card";
     const hasDebt = member.balance > 0;
     card.classList.toggle("has-debt", hasDebt);
     card.classList.toggle("has-prepaid", member.balance < 0);
     card.dataset.memberId = member.id;
     card.innerHTML = `
-      <div class="member-details">
-        <div class="member-row">
-          <span class="member-name">${member.name}</span>
-          <span class="member-balance ${memberBalanceClass(member)}">${memberBalanceLabel(member)}</span>
+      <div class="member-manage-top">
+        <div class="member-details">
+          <div class="member-manage-title">
+            <strong>${member.name}</strong>
+          </div>
+          <span class="member-group-text">${memberGroups[member.group]}</span>
         </div>
-        <span class="member-group-text">${memberGroups[member.group]}</span>
+      </div>
+      <div class="member-manage-balance">
+        <span class="member-balance ${memberBalanceClass(member)}">${memberBalanceLabel(member)}</span>
       </div>
     `;
     list.append(card);
@@ -592,8 +622,9 @@ function renderKioskProducts() {
   grid.innerHTML = "";
 
   const products = state.products
+    .filter((product) => product.displayStock > 0)
     .filter((product) => selectedCategory === "all" || product.category === selectedCategory)
-    .sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name));
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   if (!products.length) {
     grid.innerHTML = "<p class='empty-placeholder'>Aucun produit dans cette catégorie.</p>";
@@ -813,7 +844,7 @@ function renderStats() {
       class: "stat-credit",
       content: `
         <span class="stat-label">Ardoise</span>
-        <span class="stat-diff" style="color: ${prepaid >= credit ? "#10b981" : "#e5485d"}">${prepaid >= credit ? "+" : "-"}${formatMoney(Math.abs(prepaid - credit))}</span>
+        <span class="stat-diff" style="color: ${prepaid - credit >= 0 ? "#10b981" : "#e5485d"}">${formatMoney(prepaid - credit)}</span>
       `
     },
     { label: "Valeur du stock", value: formatMoney(stockValue), icon: "package", class: "stat-stock" },
@@ -830,7 +861,7 @@ function renderStats() {
           <span class="stat-label">${stat.label}</span>
           <strong>${stat.value}</strong>
         `}
-        ${stat.items ? `<div class="stat-items">${stat.items.map(p => `<span class="stat-item">${p.name} (${p.displayStock})</span>`).join("")}</div>` : ""}
+        ${stat.items ? `<div class="stat-items collapsed"><button type="button" class="stat-toggle" onclick="this.parentElement.classList.toggle('collapsed')">${stat.items.length} produit(s) bas</button><div class="stat-items-list">${stat.items.map(p => `<span class="stat-item">${p.name} (${p.displayStock})</span>`).join("")}</div></div>` : ""}
       </div>
     </article>
   `).join("");
@@ -1066,6 +1097,9 @@ function renderMemberManagement() {
           <div class="member-manage-title">
             <strong>${member.name}</strong>
             <div class="member-manage-tools">
+              <button class="member-credit-button" type="button" title="Créditer ${member.name}" aria-label="Créditer ${member.name}">
+                <i data-lucide="coins"></i>
+              </button>
               <button class="member-edit-button" type="button" title="Modifier ${member.name}" aria-label="Modifier ${member.name}">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                   <path d="M12 20h9"></path>
@@ -1091,6 +1125,7 @@ function renderMemberManagement() {
         <span class="member-balance ${memberBalanceClass(member)}">${memberBalanceLabel(member)}</span>
       </div>
     `;
+    card.querySelector(".member-credit-button").addEventListener("click", () => openMemberCreditDialog(member.id));
     card.querySelector(".member-edit-button").addEventListener("click", () => editMember(member.id));
     card.querySelector(".member-delete-button").addEventListener("click", () => {
       if (!confirm(`Supprimer ${member.name} ?`)) return;
@@ -1111,6 +1146,7 @@ function editMember(id) {
   form.elements.id.value = member.id;
   form.elements.name.value = member.name;
   form.elements.group.value = memberGroups[member.group] ? member.group : "autre";
+  form.elements.balance.value = -member.balance;
   $("#member-edit-dialog").showModal();
   form.elements.name.focus();
 }
@@ -1126,6 +1162,8 @@ function submitMemberEdit(event) {
 
   member.name = name;
   member.group = memberGroups[form.elements.group.value] ? form.elements.group.value : "autre";
+  const balance = Number(form.elements.balance.value);
+  if (!isNaN(balance)) member.balance = -balance;
   state.transactions.forEach((transaction) => {
     if (transaction.memberId === member.id) transaction.memberName = member.name;
   });
@@ -1271,22 +1309,24 @@ function inventoryOpeningCash() {
   return Math.max(0, Number(state.cashRetained) || 0);
 }
 
-function inventorySettlementTotal(cashCounted) {
-  return Number(cashCounted) - inventoryOpeningCash() + currentPeriodCashWithdrawals() + currentPeriodCreditBalance();
-}
-
 function inventoryBalance(form) {
-  const salesValue = inventorySalesValue(form);
+  const totalStockSales = inventorySalesValue(form);
+  const creditSalesValue = currentPeriodCreditSalesValue();
+  const cashSalesValue = totalStockSales - creditSalesValue;
   const cashCounted = parseMoneyInput(inventoryMoneyValue(form, "cashCounted"));
-  const settlementTotal = inventorySettlementTotal(cashCounted);
+  const openingCash = inventoryOpeningCash();
+  const withdrawn = currentPeriodCashWithdrawals();
+  const creditBalance = currentPeriodCreditBalance();
   return {
-    salesValue,
+    cashSalesValue,
+    totalStockSales,
+    creditSalesValue,
     cashCounted,
-    openingCash: inventoryOpeningCash(),
-    withdrawn: currentPeriodCashWithdrawals(),
-    creditBalance: currentPeriodCreditBalance(),
-    settlementTotal,
-    variance: settlementTotal - salesValue,
+    openingCash,
+    withdrawn,
+    creditBalance,
+    settlementTotal: cashSalesValue + creditBalance,
+    variance: (totalStockSales + cashCounted) - (creditBalance + withdrawn + openingCash),
   };
 }
 
@@ -1347,12 +1387,11 @@ function updateInventorySummary() {
   const balance = inventoryBalance($("#inventory-form"));
   const varianceText = balance.variance >= 0 ? `+${formatMoney(balance.variance)}` : formatMoney(balance.variance);
   $("#inventory-summary").innerHTML = `
-    <strong>Ventes attendues: ${formatMoney(balance.salesValue)}</strong><br>
-    Fond caisse départ: <strong>${formatMoney(balance.openingCash)}</strong>
-    <br>
-    Caisse frigo: <strong>${formatMoney(balance.cashCounted)}</strong>
+    <strong>Total des ventes: ${formatMoney(balance.totalStockSales)}</strong><br>
+    Crédit / avoir: <strong>${inventoryCreditBalanceLabel()}</strong>
+    <br>Fond caisse départ: <strong>${formatMoney(balance.openingCash)}</strong>
+    <br>Caisse frigo: <strong>${formatMoney(balance.cashCounted)}</strong>
     <br>Retrait caisse: <strong>${formatMoney(balance.withdrawn)}</strong>
-    <br>Crédit / avoir: <strong>${inventoryCreditBalanceLabel()}</strong>
     <br>Écart inventaire: <strong class="${balance.variance < 0 ? "danger" : "success"}">${varianceText}</strong>
   `;
 }
@@ -1714,7 +1753,7 @@ function handleRestockKeyboard(event) {
 }
 
 function handleInventoryKeyboard(event) {
-  const inputs = $$(".inventory-count-field input:not(:disabled)");
+  const inputs = $$("#inventory-form input:not(:disabled)");
   const currentIndex = inputs.indexOf(event.currentTarget);
 
   if (event.key === "ArrowDown") {
@@ -1731,17 +1770,25 @@ function handleInventoryKeyboard(event) {
 
   if (event.key === "Enter") {
     event.preventDefault();
-    inputs[Math.min(currentIndex + 1, inputs.length - 1)]?.focus();
-    inputs[Math.min(currentIndex + 1, inputs.length - 1)]?.select();
+    if (currentIndex >= inputs.length - 1) {
+      event.currentTarget.closest("form").requestSubmit();
+    } else {
+      inputs[currentIndex + 1]?.focus();
+      inputs[currentIndex + 1]?.select();
+    }
   }
 }
 
 function focusNextInventoryMobileField(currentInput) {
   const fields = $$("#inventory-mobile-form input:not(:disabled)");
   const currentIndex = fields.indexOf(currentInput);
-  const nextField = fields[Math.min(currentIndex + 1, fields.length - 1)];
-  nextField?.focus();
-  nextField?.select();
+  if (currentIndex >= fields.length - 1) {
+    currentInput.closest("form").requestSubmit();
+  } else {
+    const nextField = fields[currentIndex + 1];
+    nextField?.focus();
+    nextField?.select();
+  }
 }
 
 function handleInventoryMobileKeyboard(event) {
@@ -1761,7 +1808,46 @@ function syncInventoryDraftFromInput(event) {
 }
 
 function inventoryExpectedCash() {
-  return inventorySalesValue($("#inventory-form"));
+  const total = inventorySalesValue($("#inventory-form"));
+  return total - currentPeriodCreditSalesValue();
+}
+
+function memberCreditSummary() {
+  const periodTxs = currentPeriodTransactions();
+  return state.members.map((member) => {
+    const purchases = periodTxs
+      .filter((t) => t.type === "sale" && t.payment === "credit" && t.memberId === member.id)
+      .reduce((s, t) => s + t.amount, 0);
+    const payments = periodTxs
+      .filter((t) => t.type === "payment" && t.memberId === member.id)
+      .reduce((s, t) => s + t.amount, 0);
+    return {
+      name: member.name,
+      group: memberGroups[member.group] || member.group,
+      balance: member.balance,
+      status: member.balance > 0 ? "doit" : member.balance < 0 ? "avoir" : "neutre",
+      periodPurchases: purchases,
+      periodPayments: payments,
+      periodChange: purchases - payments,
+    };
+  });
+}
+
+async function exportMemberCreditSummary() {
+  const from = state.lastInventoryAt ? new Date(state.lastInventoryAt).toISOString() : null;
+  const to = new Date().toISOString();
+  const data = {
+    exportedAt: to,
+    period: { from, to },
+    members: memberCreditSummary(),
+  };
+  try {
+    await fetch("/api/export/credit-summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch {}
 }
 
 function submitInventory(event) {
@@ -1771,7 +1857,7 @@ function submitInventory(event) {
   if (!validateCashRetained(form)) return;
   if (!confirmInventoryClose()) return;
   const balance = inventoryBalance(form);
-  const expectedCash = balance.salesValue;
+  const expectedCash = balance.cashSalesValue;
   const cashCounted = parseMoneyInput(inventoryMoneyValue(form, "cashCounted"));
   const cashRetained = parseMoneyInput(inventoryMoneyValue(form, "cashRetained"));
   const countedProducts = [];
@@ -1811,6 +1897,7 @@ function submitInventory(event) {
   clearInventoryDraft();
   saveState();
   render();
+  exportMemberCreditSummary();
   toast("Inventaire cloture.");
 }
 
@@ -1910,8 +1997,8 @@ function updateInventoryMobileSummary() {
 
   summary.innerHTML = `
     <div class="inv-summary-row">
-      <span>Ventes attendues</span>
-      <strong>${formatMoney(balance.salesValue)}</strong>
+      <span>Total des ventes</span>
+      <strong>${formatMoney(balance.totalStockSales)}</strong>
     </div>
     <div class="inv-summary-row">
       <span>Fond caisse départ</span>
@@ -1943,7 +2030,7 @@ function submitInventoryMobile(event) {
   if (!validateCashRetained(form)) return;
   if (!confirmInventoryClose()) return;
   const balance = inventoryBalance(form);
-  const expectedCash = balance.salesValue;
+  const expectedCash = balance.cashSalesValue;
   const countedProducts = [];
 
   state.products.forEach((product) => {
@@ -1984,6 +2071,7 @@ function submitInventoryMobile(event) {
   clearInventoryDraft();
   saveState();
   render();
+  exportMemberCreditSummary();
   const needsRestock = state.products.some((p) => p.restockTarget > p.displayStock);
   if (needsRestock) {
     $("#inventory-mobile-form").classList.add("hidden");
@@ -2286,6 +2374,7 @@ function bindEvents() {
     input.addEventListener("change", rememberMoneyInput);
     input.addEventListener("keyup", rememberMoneyInput);
     input.addEventListener("keydown", rememberMoneyInputSoon);
+    input.addEventListener("keydown", handleInventoryKeyboard);
     input.addEventListener("blur", rememberMoneyInput);
     input.addEventListener("compositionend", rememberMoneyInput);
     input.addEventListener("paste", rememberMoneyInputSoon);

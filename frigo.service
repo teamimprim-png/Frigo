@@ -1,0 +1,15 @@
+[Unit]
+Description=Frigo Équipe - Kiosque Node.js
+After=network.target
+
+[Service]
+Type=simple
+User=teamimprim
+WorkingDirectory=/home/teamimprim/Application/Frigo
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

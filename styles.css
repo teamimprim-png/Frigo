@@ -738,10 +738,39 @@ main {
   color: var(--rose-light);
 }
 
+.member-credit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--purple-light);
+}
+
+.member-credit-button:hover {
+  background: var(--purple-glow);
+  color: var(--purple);
+}
+
+.member-credit-button i {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
 .member-edit-button i,
 .member-edit-button svg,
 .member-delete-button i,
-.member-delete-button svg {
+.member-delete-button svg,
+.member-credit-button svg {
   width: 15px;
   height: 15px;
   display: block;
@@ -1499,6 +1528,27 @@ button:active {
   flex-direction: column;
   gap: 2px;
   margin-top: 4px;
+}
+
+.stat-items.collapsed .stat-items-list {
+  display: none;
+}
+
+.stat-items:not(.collapsed) .stat-toggle {
+  display: none;
+}
+
+.stat-toggle {
+  background: none;
+  border: none;
+  color: var(--amber);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .stat-item {
@@ -2277,17 +2327,13 @@ dialog[open]::backdrop {
   max-height: none;
   min-height: 0;
   overflow-y: auto;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, 200px);
   gap: 12px;
   padding-right: 4px;
 }
 
 .kiosk-credit-overlay .member-card {
-  min-height: 0;
-  height: auto;
-  padding: 8px 12px;
-  gap: 0;
-  border-radius: 8px;
+  height: 118px;
   cursor: pointer;
 }
 
@@ -2298,31 +2344,6 @@ dialog[open]::backdrop {
 
 .kiosk-credit-overlay .member-card:active {
   transform: scale(0.98);
-}
-
-.kiosk-credit-overlay .member-card .member-details {
-  gap: 1px;
-}
-
-.kiosk-credit-overlay .member-card .member-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.kiosk-credit-overlay .member-card .member-name {
-  font-size: 0.92rem;
-  font-weight: 800;
-}
-
-.kiosk-credit-overlay .member-card .member-balance {
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.kiosk-credit-overlay .member-card .member-group-text {
-  font-size: 0.68rem;
 }
 
 .kiosk-credit-button {
@@ -3034,6 +3055,91 @@ body[data-page="kiosk"] .section-heading {
 
 body[data-page="kiosk"] .kiosk-layout {
   max-width: 1180px;
+}
+
+body[data-page="kiosk"]::before {
+  display: none;
+}
+
+body[data-page="kiosk"] .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  height: auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px clamp(20px, 4vw, 40px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  border-right: 0;
+  box-shadow: none;
+  overflow: visible;
+  gap: 20px;
+}
+
+body[data-page="kiosk"] .app-header > div:first-child {
+  position: static;
+  min-height: 0;
+  padding-left: 0;
+}
+
+body[data-page="kiosk"] .app-header > div:first-child::before,
+body[data-page="kiosk"] .app-header > div:first-child::after {
+  display: none;
+}
+
+body[data-page="kiosk"] .app-header h1 {
+  color: var(--indigo);
+  font-size: 1.25rem;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+body[data-page="kiosk"] .app-header p {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+body[data-page="kiosk"] .kiosk-sidebar-add {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0;
+}
+
+body[data-page="kiosk"] main {
+  margin: 0;
+}
+
+body[data-page="kiosk"] .kiosk-layout > .product-panel {
+  max-height: calc(100vh - 125px);
+}
+
+body[data-page="kiosk"] .cart-panel {
+  top: 98px;
+  max-height: calc(100vh - 130px);
+}
+
+body[data-page="kiosk"] .kiosk-layout > .product-panel .product-grid {
+  min-height: 0;
+}
+
+body[data-page="kiosk"] .product-panel > .tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+  border-radius: 0;
+  gap: 4px;
 }
 
 body[data-page="management"] .management-shell {
